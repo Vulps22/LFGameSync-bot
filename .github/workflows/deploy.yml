@@ -1,0 +1,35 @@
+name: Deploy to Live Server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Transpile code 
+        run: npm run build
+        
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_HOST }}
+          if_key_exists: replace
+
+      - name: Copy files
+        run: |
+          scp -i ~/.ssh/id_rsa -r dist/* vulps@161.97.68.166:/var/gamesync-bot
+          scp -i ~/.ssh/id_rsa package.json vulps@161.97.68.166:/var/gamesync-bot
+
+      - name: Install dependencies on server
+        run: ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && npm install --production'
