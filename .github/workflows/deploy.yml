@@ -26,5 +26,10 @@ jobs:
           known_hosts: ${{ secrets.SSH_HOST }}
           if_key_exists: replace
 
-      - name: Copy dist folder
-        run: scp -i ~/.ssh/id_rsa -r dist/* vulps@161.97.68.166:/var/gamesync-bot
+      - name: Copy files
+        run: |
+          scp -i ~/.ssh/id_rsa dist/ vulps@161.97.68.166:/var/gamesync-bot
+          scp -i ~/.ssh/id_rsa package.json vulps@161.97.68.166:/var/gamesync-bot
+
+      - name: Install dependencies on server
+        run: ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && npm install --production'
