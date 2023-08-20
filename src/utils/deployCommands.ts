@@ -23,7 +23,6 @@ export default {
 
 			// Checks if the command has a valid structure.
 			if (!command || !command.data || !command.execute) {
-				console.log(command);
 				Logger.log('DeploymentCommands', `${name} does not have a valid command structure.`);
 				return;
 			}
