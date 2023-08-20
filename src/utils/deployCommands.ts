@@ -40,6 +40,7 @@ export default {
 	 */
 	deployCommands: async function (rest: REST) {
 		console.log('Started refreshing application (/) commands.');
+		console.log(this.getDeploymentJson());
 		const data = await rest.put(
 			Routes.applicationCommands(config.clientId),
 			{ body: this.getDeploymentJson() },
