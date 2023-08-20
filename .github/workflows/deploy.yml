@@ -27,4 +27,4 @@ jobs:
           if_key_exists: replace
 
       - name: Copy dist folder
-        run: scp -i ~/.ssh/id_rsa -r dist/ vulps@161.97.68.166:/var/gamesync-bot
+        run: scp -i ~/.ssh/id_rsa -r dist/* vulps@161.97.68.166:/var/gamesync-bot
