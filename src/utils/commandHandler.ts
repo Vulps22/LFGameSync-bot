@@ -39,12 +39,15 @@ export default {
 			// Adds the command to the collection.
 			commands.set(command.data.name, command);
 		}
+
+		console.log(commands)
 	},
 
 	/**
 	 * @returns {Map<string, Command>} The commands collection.
 	 */
 	getCommands: function() {
+		console.log(commands)
 		return commands;
 	}
 }
