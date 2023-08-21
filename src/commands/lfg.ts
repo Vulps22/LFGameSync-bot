@@ -25,9 +25,14 @@ const lfgCommand: Command = {
 		}
 
 		try {
-			const data = await axios.get(`${config.baseURL}/api/lfg/find?game=${gameName}&server=${serverId}`);
-
-			const users = data.data['data'] ?? [];
+			const data = await axios.get(`${config.baseURL}/api/lfg/find?game=${gameName}&server=${serverId}&user_id=${interaction.user.id}`);
+	
+			if (data.data === "Not Sharing") {
+				await action.reply({ content: 'Visit https://gamesync.ajmcallister.co.uk and turn on Library Sharing for this server to continue.', ephemeral: true });
+				return;
+			}
+	
+			const users = data.data['data'];
 
 			if (users.length === 0) {
 				await action.reply({ content: 'No users found with that game', ephemeral: true });

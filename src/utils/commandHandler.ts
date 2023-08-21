@@ -21,8 +21,9 @@ export default {
 
 		// Gets all command files - Filters out non .js files.
 		const commandsPath = filePath.join(__dirname, "..", "commands");
-		let commandFiles: string[] = fileSystem.readdirSync(commandsPath).filter((file: String) => file.endsWith(".js"));
-		commandFiles = commandFiles.concat(fileSystem.readdirSync(commandsPath).filter((file: String) => file.endsWith(".ts")));
+		let commandFiles: string[] = fileSystem.readdirSync(commandsPath).filter((file: string) => {
+			return file.endsWith(".js") || file.endsWith(".ts");
+		});	
 
 		// Loads all the commands in the command's folder.
 		for (const file of commandFiles) {
