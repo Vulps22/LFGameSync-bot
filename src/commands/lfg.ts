@@ -32,7 +32,7 @@ const lfgCommand: Command = {
 				return;
 			}
 	
-			const users = data.data['data'];
+			const users = data.data['data'] ?? [];
 
 			if (users.length === 0) {
 				await action.reply({ content: 'No users found with that game', ephemeral: true });
