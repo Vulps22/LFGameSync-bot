@@ -6,6 +6,12 @@ import Logger from './utils/logger';
 import EventHandler from './utils/eventHandler';
 import Config from './config';
 
+/**
+ * https://discord.com/api/oauth2/authorize?client_id=1139301810369204254&permissions=2147601472&scope=bot
+ */
+
+
+
 // Logging that the client is starting.
 Logger.log('Client', 'Starting...');
 

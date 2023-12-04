@@ -1,0 +1,30 @@
+import axios from "axios";
+import { Interaction } from "discord.js";
+import config from "../config";
+import BotEvent from "../interfaces/botEvent";
+
+const BotJoinEvent: BotEvent = {
+	name: "guildCreate",
+	once: false,
+	async execute(interaction: Interaction) {
+		console.log("Joined a server!")
+
+		// send server ID, name and image to https://gamesync.ajmcallister.co.uk/api/lfg/register_server
+		console.log(`${config.baseURL}/api/lfg/register_server`);
+		const data = {
+			server_id: interaction.guildId,
+			server_name: interaction.guild?.name,
+			server_image: interaction.guild?.iconURL()
+		};
+
+		const configuration = {
+			url: `${config.baseURL}/api/lfg/register_server`,
+			method: 'post',
+			data: data,
+		};
+
+		await axios.post(config.baseURL + '/api/lfg/register_server', data);
+	},
+}
+
+module.exports = BotJoinEvent;
