@@ -33,12 +33,16 @@ const link: Command = {
 				// response.data holds the parsed response data 
 				console.log(response.data);
 				action.reply({
-					content:`Game Library Sharing has been ${state ? 'enabled' : 'disabled'} on this server`,
+					content:`Game Library Sharing has been ${state === true ? 'enabled' : 'disabled'} on this server`,
 					ephemeral: true
 				});
 			})
 			.catch(error => {
 				console.log(error);
+				action.reply({
+					content:`An error has occured. The Developers have been notified.`,
+					ephemeral: true
+				});
 			});
 
 
