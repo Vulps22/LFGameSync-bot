@@ -6,13 +6,13 @@ import BotEvent from "../interfaces/botEvent";
 const BotJoinEvent: BotEvent = {
 	name: "guildDelete",
 	once: false,
-	async execute(interaction: Interaction) {
+	async execute(guild) {
 		console.log("Left a server!")
 
 		// send server ID to https://gamesync.ajmcallister.co.uk/api/lfg/remove_server
 		console.log(`${config.baseURL}/api/lfg/remove_server`);
 		const data = {
-			server_id: interaction.guildId
+			server_id: guild.id
 		};
 
 		console.log(data)
