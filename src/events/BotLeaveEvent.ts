@@ -15,7 +15,14 @@ const BotJoinEvent: BotEvent = {
 			server_id: interaction.guildId
 		};
 
-		await axios.post(config.baseURL + '/api/lfg/register_server', data);
+		await axios.post(config.baseURL + '/api/lfg/remove_server', data)
+			.then(response => {
+				// response.data holds the parsed response data 
+				console.log(response.data);
+			})
+			.catch(error => {
+				console.log(error);
+			});
 	},
 }
 

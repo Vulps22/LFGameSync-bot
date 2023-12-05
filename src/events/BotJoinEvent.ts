@@ -23,7 +23,14 @@ const BotJoinEvent: BotEvent = {
 			data: data,
 		};
 
-		await axios.post(config.baseURL + '/api/lfg/register_server', data);
+		await axios.post(config.baseURL + '/api/lfg/register_server', data)
+			.then(response => {
+				// response.data holds the parsed response data 
+				console.log(response.data);
+			})
+			.catch(error => {
+				console.log(error);
+			});
 	},
 }
 
