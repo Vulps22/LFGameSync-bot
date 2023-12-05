@@ -12,7 +12,7 @@ const BotJoinEvent: BotEvent = {
 		// send server ID, name and image to https://gamesync.ajmcallister.co.uk/api/lfg/register_server
 		console.log("Registering Server with data: ");
 		const data = {
-			server_id: interaction.guildId,
+			server_id: interaction.guild?.id,
 			server_name: interaction.guild?.name,
 			server_image: interaction.guild?.iconURL()
 		};
