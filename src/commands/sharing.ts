@@ -14,7 +14,7 @@ const link: Command = {
 	async execute(interaction: Interaction) {
 		let action = interaction as CommandInteraction;
 		const options = action.options as CommandInteractionOptionResolver;
-		let state = options.getBoolean('state');
+		let state = options.getBoolean('set');
 
 		const userId = interaction.user.id
 
