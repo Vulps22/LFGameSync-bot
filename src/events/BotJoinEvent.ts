@@ -6,15 +6,15 @@ import BotEvent from "../interfaces/botEvent";
 const BotJoinEvent: BotEvent = {
 	name: "guildCreate",
 	once: false,
-	async execute(interaction: Interaction) {
+	async execute(guild) {
 		console.log("Joined a server!")
 
 		// send server ID, name and image to https://gamesync.ajmcallister.co.uk/api/lfg/register_server
 		console.log("Registering Server with data: ");
 		const data = {
-			server_id: interaction.guild?.id,
-			server_name: interaction.guild?.name,
-			server_image: interaction.guild?.iconURL()
+			server_id: guild?.id,
+			server_name: guild?.name,
+			server_image: guild?.iconURL()
 		};
 
 		console.log(data);
