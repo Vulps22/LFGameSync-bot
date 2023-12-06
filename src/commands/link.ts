@@ -1,7 +1,7 @@
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import { Interaction } from "discord.js";
 import Command from "src/interfaces/Command";
-import config from "src/config";
+import config from '../config'
 
 const link: Command = {
 	data: new SlashCommandBuilder()
