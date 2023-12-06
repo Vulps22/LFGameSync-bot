@@ -5,11 +5,14 @@ import config from '../config'
 
 const link: Command = {
 	data: new SlashCommandBuilder()
-	.setName('dashboard')
-	.setDescription('A link to the bot\'s dashboard where you can enable sharing with this server'),
+		.setName('dashboard')
+		.setDescription('A link to the bot\'s dashboard where you can enable sharing with this server'),
 	async execute(interaction: Interaction) {
 		let action = interaction as CommandInteraction;
-		action.reply(`[Dashboard](${config.baseURL})`);
+		action.reply({
+			content: `[Dashboard](${config.baseURL})`,
+			ephemeral: true
+		});
 	}
 }
 

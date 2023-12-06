@@ -31,9 +31,12 @@ const link: Command = {
 		await axios.post(config.baseURL + '/api/server/set_sharing', data)
 			.then(response => {
 				// response.data holds the parsed response data 
+				const data = response.data;
 				console.log(response.data);
+				if(data.message !== "Sharing Changed") throw new Error(data.message);
+
 				action.reply({
-					content:`Game Library Sharing has been ${state === true ? 'enabled' : 'disabled'} on this server`,
+					content:`Game Library Sharing has been ${state === true ? 'enabled' : 'disabled'} on this server ${data.isLinked ? '' : 'but you have not linked your Steam Library. Visit the [Dashboard](' + config.baseURL + ') to sync your games with the bot'}`,
 					ephemeral: true
 				});
 			})
