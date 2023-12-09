@@ -3,6 +3,7 @@ import { Interaction } from "discord.js";
 import config from '../config'
 import Command from "src/interfaces/Command";
 import axios from "axios";
+import Caller from "../utils/caller";
 
 const link: Command = {
 	data: new SlashCommandBuilder()
@@ -19,36 +20,33 @@ const link: Command = {
 		const userId = interaction.user.id
 
 		// send server ID, user ID and state to https://gamesync.ajmcallister.co.uk/api/server/set_sharing
-		console.log(`${config.baseURL}/api/server/set_sharing`);
-		const data = {
-			server_id: action.guildId,
-			user_id: userId,
-			state: state
-		};
+		try {
+			const response = await Caller.setSharing(action.guildId!, action.user.id, state!)
+			const data = response.data;
+			console.log(response.data);
 
-		console.log(data)
+			switch (data.message) {
 
-		await axios.post(config.baseURL + '/api/server/set_sharing', data)
-			.then(response => {
-				// response.data holds the parsed response data 
-				const data = response.data;
-				console.log(response.data);
-				if(data.message !== "Sharing Changed") throw new Error(data.message);
+				case 'Server not found':
+					await Caller.registerServer(action.guildId!, action.guild!.name!, action.guild!.iconURL()!);
+					this.execute(interaction);
+					return;
+				case 'User not Found':
+					await Caller.registerUser(action.guildId!, action.user.id, action.user.username)
+					this.execute(interaction);
+					return;
+				case 'Sharing Changed':
+					break;
+			}
 
-				action.reply({
-					content:`Game Library Sharing has been ${state === true ? 'enabled' : 'disabled'} on this server ${data.isLinked ? '' : 'but you have not linked your Steam Library. Visit the [Dashboard](' + config.baseURL + ') to sync your games with the bot'}`,
-					ephemeral: true
-				});
-			})
-			.catch(error => {
-				console.log(error);
-				action.reply({
-					content:`An error has occured. The Developers have been notified.`,
-					ephemeral: true
-				});
+			action.reply({
+				content: `Game Library Sharing has been ${state === true ? 'enabled' : 'disabled'} on this server ${data.isLinked ? '' : 'but you have not linked your Steam Library. Visit the [Dashboard](' + config.baseURL + ') to sync your games with the bot'}`,
+				ephemeral: true
 			});
-
-
+		} catch (error) {
+			console.error("Error While running /sharing")
+			console.error(error);
+		}
 
 	}
 }

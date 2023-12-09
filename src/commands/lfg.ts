@@ -3,6 +3,7 @@ import { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilde
 import axios from 'axios';
 import Command from 'src/interfaces/Command';
 import config from '../config'
+import Caller from '../utils/caller';
 
 const lfgCommand: Command = {
 	data: new SlashCommandBuilder()
@@ -17,7 +18,8 @@ const lfgCommand: Command = {
 		let action = interaction as CommandInteraction;
 		const options = action.options as CommandInteractionOptionResolver
 		const gameName = options.getString('game');
-		const serverId = interaction.guildId;
+		const serverId = interaction.guildId!;
+		const userId = interaction.user.id;
 		console.log("Starting Game search for " + gameName + " on server " + interaction.guild?.name + "...")
 		if (!gameName) {
 			await action.reply('No game name provided');
@@ -25,13 +27,22 @@ const lfgCommand: Command = {
 		}
 
 		try {
-			const data = await axios.get(`${config.baseURL}/api/lfg/find?game=${gameName}&server=${serverId}&user_id=${interaction.user.id}`);
-	
-			if (data.data === "Not Sharing") {
-				await action.reply({ content: 'Visit https://gamesync.ajmcallister.co.uk and turn on Library Sharing for this server to continue.', ephemeral: true });
-				return;
+			const data = await Caller.find(gameName, serverId, userId);
+
+			switch (data.data) {
+				case 'Not Sharing':
+					await action.reply({ content: `Use /sharing, or visit the [Dashboard](${config.baseURL}) to turn on Library Sharing for this server to continue.`, ephemeral: true });
+					break;
+				case 'Server not found':
+					await Caller.registerServer(serverId, action.guild!.name, action.guild!.iconURL() ?? '');
+					this.execute(interaction);
+					return;
+				case 'Server User not Registered':
+					await Caller.registerUser(serverId, userId, action.user.username);
+					this.execute;
+					break;
 			}
-	
+
 			const users = data.data['data'] ?? [];
 
 			if (users.length === 0) {
