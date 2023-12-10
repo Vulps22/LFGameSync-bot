@@ -89,6 +89,14 @@ const Caller = {
         } catch (error) {
             return handleError(error, 'Error in registerUser API call');
         }
+    },
+    findGame: async (name: string) => {
+        try {
+            const response = await axios.get(`${config.baseURL}/api/lfg/find_game?name=${name}`);
+            return handleResponse(response, null);
+        } catch (error) {
+            return handleError(error, 'Error in registerUser API call');
+        }
     }
 };
 

@@ -1,4 +1,4 @@
-import { Interaction, CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, StringSelectMenuInteraction } from 'discord.js';
+import { Interaction, CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, StringSelectMenuInteraction, AutocompleteInteraction } from 'discord.js';
 import { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } from 'discord.js';
 import axios from 'axios';
 import Command from 'src/interfaces/Command';
@@ -11,7 +11,19 @@ const lfgCommand: Command = {
 		.setDescription('Find users who own a game')
 		.addStringOption(option => option.setName('game')
 			.setDescription('The game to search for')
+			.setAutocomplete(true)
 			.setRequired(true)) as SlashCommandBuilder,
+
+	async autoComplete(interaction: Interaction) {
+		const action = interaction as AutocompleteInteraction;
+
+		const name = action.options.getFocused();
+		console.log(name);
+
+		const games = await Caller.findGame(name);
+		console.log(games);
+		action.respond(games.data.map((game: string) => ({ name: game, value: game })));
+	},
 
 	async execute(interaction: Interaction) {
 
@@ -32,15 +44,15 @@ const lfgCommand: Command = {
 			switch (data.data) {
 				case 'Not Sharing':
 					await action.reply({ content: `Use /sharing, or visit the [Dashboard](${config.baseURL}) to turn on Library Sharing for this server to continue.`, ephemeral: true });
-					break;
+					return;
 				case 'Server not found':
 					await Caller.registerServer(serverId, action.guild!.name, action.guild!.iconURL() ?? '');
 					this.execute(interaction);
 					return;
 				case 'Server User not Registered':
 					await Caller.registerUser(serverId, userId, action.user.username);
-					this.execute;
-					break;
+					this.execute(interaction);
+					return;
 			}
 
 			const users = data.data['data'] ?? [];
