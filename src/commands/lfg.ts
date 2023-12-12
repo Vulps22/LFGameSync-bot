@@ -1,9 +1,11 @@
-import { Interaction, CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, StringSelectMenuInteraction, AutocompleteInteraction } from 'discord.js';
+import { Interaction, CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, StringSelectMenuInteraction, AutocompleteInteraction, ButtonBuilder, ButtonStyle, ButtonInteraction, AnySelectMenuInteraction } from 'discord.js';
 import { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } from 'discord.js';
-import axios from 'axios';
-import Command from 'src/interfaces/Command';
+
+import Command from '../interfaces/Command';
 import config from '../config'
 import Caller from '../utils/caller';
+import Game from '../interfaces/game';
+import EmbeddedGame from '../utils/embeddedGame';
 
 const lfgCommand: Command = {
 	data: new SlashCommandBuilder()
@@ -22,24 +24,24 @@ const lfgCommand: Command = {
 
 		const games = await Caller.findGame(name);
 		console.log(games);
-		action.respond(games.data.map((game: string) => ({ name: game, value: game })));
+		action.respond(games.data.map((game: Game) => ({ name: game.name, value: String(game.id) })));
 	},
 
 	async execute(interaction: Interaction) {
 
 		let action = interaction as CommandInteraction;
 		const options = action.options as CommandInteractionOptionResolver
-		const gameName = options.getString('game');
+		const gameId = options.getString('game');
 		const serverId = interaction.guildId!;
 		const userId = interaction.user.id;
-		console.log("Starting Game search for " + gameName + " on server " + interaction.guild?.name + "...")
-		if (!gameName) {
-			await action.reply('No game name provided');
+		console.log("Starting Game search for " + gameId + " on server " + interaction.guild?.name + "...")
+		if (!gameId) {
+			await action.reply('No game provided');
 			return;
 		}
 
 		try {
-			const data = await Caller.find(gameName, serverId, userId);
+			const data = await Caller.find(gameId, serverId, userId);
 
 			switch (data.data) {
 				case 'Not Sharing':
@@ -65,7 +67,7 @@ const lfgCommand: Command = {
 				.setCustomId('lfg')
 				.setPlaceholder('Select a user to message')
 				.setMinValues(1)
-				.setMaxValues(users.length);//lawl, that sounds fucking daft
+				.setMaxValues(users.length);
 			selectMenu.addOptions(users.map((user: any) => {
 				return new StringSelectMenuOptionBuilder()
 					.setLabel(user.discord_name)
@@ -73,38 +75,56 @@ const lfgCommand: Command = {
 					.setDescription(user.discord_name);
 			}));
 
-			const row = new ActionRowBuilder()
+
+			const openRequestButton = new ButtonBuilder()
+				.setCustomId('open_request')
+				.setLabel('Anyone')
+				.setStyle(ButtonStyle.Success);
+			const selectRow = new ActionRowBuilder()
 				.addComponents(selectMenu).toJSON();
+
+			const buttonRow = new ActionRowBuilder()
+				.addComponents(openRequestButton).toJSON();
 
 			if (action.deferred || action.replied) return;
 
 			const response = await action.reply({
 				content: 'Who do you want to tag?',
-				components: [row as any],
+				components: [selectRow as any], //, buttonRow as any
 				ephemeral: true
 			});
 
-			const collectorFilter = (i: any) => i.user.id === interaction.user.id;
+			const collectorFilter = (interaction: AnySelectMenuInteraction | ButtonInteraction) =>
+				interaction.user.id === interaction.user.id;
 
-			const selection = await response.awaitMessageComponent({ filter: collectorFilter, time: 60_000 }) as StringSelectMenuInteraction;
+			const selection = await response.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
+			const gameData = await Caller.getGame(gameId);
+			const game = gameData.data as Game;
+			console.log(game);
+			if (selection.isStringSelectMenu()) {
+				const selectedValues: string[] = selection.values;
 
-			if (selection.customId === 'lfg') {
-				console.log(selection.values);
-				if (selection.values.length === 0) action.editReply(`${interaction.user.displayName} would like somebody to play ${gameName} with them.`)
-				if (selection.values.length > 0) {
-					//build the username string
-					const selectedUserNames = users
-						.filter((user: any) => selection.values.includes(user.discord_id))
-						.map((user: any) => user.discord_id);
+				// Build the username string
+				const selectedUserNames: string[] = users
+					.filter((user: any) => selectedValues.includes(user.discord_id))
+					.map((user: any) => user.discord_id);
 
-					action.deleteReply();
-					let stringBuilder: string[] = [];
-					selectedUserNames.forEach((id: string) => {
-						stringBuilder.push(`<@${id}>`);
-					});
-					action.channel?.send(`<@${interaction.user.id}> would like to play ${gameName} with ${stringBuilder.join(' ')}.`);
-				}
+				action.deleteReply();
+				let stringBuilder: string[] = [];
+				selectedUserNames.forEach((id: string) => {
+					stringBuilder.push(`<@${id}>`);
+				});
+
+				action.channel?.send(`<@${interaction.user.id}> would like to play ${game.name} with ${stringBuilder.join(' ')}.`);
+
+			} else if (selection.isButton() && selection.customId === 'open_request') {
+
+				const embeddedGame = new EmbeddedGame(String(game.id));
+				const gameEmbed = await embeddedGame.toJSON(interaction.user.id)
+
+				action.channel?.send({ embeds: [gameEmbed] });
 			}
+
 
 		} catch (error) {
 			console.error(error);

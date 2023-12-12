@@ -25,9 +25,9 @@ const handleError = (error: any, errorMessage: any) => {
 };
 
 const Caller = {
-    find: async (gameName: string, serverId: string, userId: string) => {
+    find: async (gameId: string, serverId: string, userId: string) => {
         try {
-            const response = await axios.get(`${config.baseURL}/api/lfg/find?game=${gameName}&server=${serverId}&user_id=${userId}`);
+            const response = await axios.get(`${config.baseURL}/api/lfg/find?game_id=${gameId}&server=${serverId}&user_id=${userId}`);
             return handleResponse(response, null);
         } catch (error) {
             return handleError(error, 'Error in find API call');
@@ -93,6 +93,14 @@ const Caller = {
     findGame: async (name: string) => {
         try {
             const response = await axios.get(`${config.baseURL}/api/lfg/find_game?name=${name}`);
+            return handleResponse(response, null);
+        } catch (error) {
+            return handleError(error, 'Error in registerUser API call');
+        }
+    },
+    getGame: async (id: string) => {
+        try {
+            const response = await axios.get(`${config.baseURL}/api/lfg/get_game?id=${id}`);
             return handleResponse(response, null);
         } catch (error) {
             return handleError(error, 'Error in registerUser API call');
