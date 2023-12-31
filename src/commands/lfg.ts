@@ -1,4 +1,4 @@
-import { Interaction, CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, StringSelectMenuInteraction, AutocompleteInteraction, ButtonBuilder, ButtonStyle, ButtonInteraction, AnySelectMenuInteraction } from 'discord.js';
+import { Interaction, CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, AutocompleteInteraction, ButtonBuilder, ButtonStyle, ButtonInteraction, AnySelectMenuInteraction } from 'discord.js';
 import { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } from 'discord.js';
 
 import Command from '../interfaces/Command';

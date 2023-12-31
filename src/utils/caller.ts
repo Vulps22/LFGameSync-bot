@@ -3,11 +3,12 @@
  */
 
 import config from "../config";
+import logger from "./logger";
 
 const axios = require('axios');
 
 const handleResponse = (response: any, successMessage: any) => {
-    console.log(response.data);
+    //console.log(response.data);
 
     // You can customize this part based on your needs
     if (successMessage) {
@@ -19,6 +20,7 @@ const handleResponse = (response: any, successMessage: any) => {
 
 const handleError = (error: any, errorMessage: any) => {
     console.error('Error in API call:', error);
+    logger.log("Error", `error in API Call: ${error}`)
 
     // You can customize this part based on your needs
     throw new Error(errorMessage || 'An error occurred during the API call.');
@@ -104,6 +106,14 @@ const Caller = {
             return handleResponse(response, null);
         } catch (error) {
             return handleError(error, 'Error in registerUser API call');
+        }
+    },
+    askForToken: async(id: string) => {
+        try {
+            const response = await axios.get(`${config.baseURL}/api/account/link_token?discord_id=${id}`);
+            return handleResponse(response, null);
+        } catch (error) {
+            return handleError(error, 'Error in askForToken API call');
         }
     }
 };
