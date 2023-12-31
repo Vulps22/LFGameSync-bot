@@ -20,10 +20,8 @@ const lfgCommand: Command = {
 		const action = interaction as AutocompleteInteraction;
 
 		const name = action.options.getFocused();
-		console.log(name);
 
 		const games = await Caller.findGame(name);
-		console.log(games);
 		action.respond(games.data.map((game: Game) => ({ name: game.name, value: String(game.id) })));
 	},
 
@@ -34,7 +32,6 @@ const lfgCommand: Command = {
 		const gameId = options.getString('game');
 		const serverId = interaction.guildId!;
 		const userId = interaction.user.id;
-		console.log("Starting Game search for " + gameId + " on server " + interaction.guild?.name + "...")
 		if (!gameId) {
 			await action.reply('No game provided');
 			return;
@@ -90,7 +87,7 @@ const lfgCommand: Command = {
 
 			const response = await action.reply({
 				content: 'Who do you want to tag?',
-				components: [selectRow as any], //, buttonRow as any
+				components: [selectRow as any, buttonRow as any], //, buttonRow as any
 				ephemeral: true
 			});
 
@@ -100,7 +97,7 @@ const lfgCommand: Command = {
 			const selection = await response.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
 			const gameData = await Caller.getGame(gameId);
 			const game = gameData.data as Game;
-			console.log(game);
+
 			if (selection.isStringSelectMenu()) {
 				const selectedValues: string[] = selection.values;
 
@@ -110,13 +107,13 @@ const lfgCommand: Command = {
 					.map((user: any) => user.discord_id);
 
 				action.deleteReply();
-				let stringBuilder: string[] = [];
-				selectedUserNames.forEach((id: string) => {
-					stringBuilder.push(`<@${id}>`);
-				});
+				
+				const embeddedGame = new EmbeddedGame(String(game.id));
+				embeddedGame.addUsers(selectedUserNames);
 
-				action.channel?.send(`<@${interaction.user.id}> would like to play ${game.name} with ${stringBuilder.join(' ')}.`);
+				const gameEmbed = await embeddedGame.toJSON(interaction.user.id)
 
+				action.channel?.send({embeds: [gameEmbed]})
 			} else if (selection.isButton() && selection.customId === 'open_request') {
 
 				const embeddedGame = new EmbeddedGame(String(game.id));

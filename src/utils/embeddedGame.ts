@@ -1,4 +1,4 @@
-import { APIEmbed, EmbedBuilder } from 'discord.js';
+import { APIEmbed, APIEmbedField, EmbedBuilder, RestOrArray } from 'discord.js';
 
 import Game from '../interfaces/game';
 import Caller from '../utils/caller';
@@ -6,16 +6,18 @@ import { exit } from 'process';
 
 class EmbeddedGame {
   private gameId: string;
+  private users: string[];
 
   constructor(gameId: string) {
     this.gameId = gameId;
+    this.users = [];
   }
 
   async fetchGameData(): Promise<Game | null> {
     try {
       const gameData = await Caller.getGame(this.gameId);
         const game = gameData.data as Game;
-        console.log(game);
+        
       if(!game.id) throw new Error("Game ID Missing");
       if(!game.name) throw new Error("Game Name Missing");
       if(!game.image) throw new Error("Game Image Missing");
@@ -41,11 +43,26 @@ class EmbeddedGame {
 
     const embed = new EmbedBuilder()
       .setTitle(gameData.name)
-      .setDescription(`<@${user}> wants to play ${gameData.name}`)
-      .addFields({name: 'Get The Game', value: `[Steam Store](https://store.steampowered.com/app/${gameData.storeId!})`})
+      .setDescription(`<@${user}> wants to play ${gameData.name} ${this.users.length > 0 ? 'with' : ''}`)
+      
+      //if there are users to tag
+      if(this.users.length > 0){
+        const fields: RestOrArray<APIEmbedField> = [];
+        this.users.forEach(userId => {
+          fields.push({name: ' ', value: `- <@${userId}>`})
+        });
+        embed.addFields(fields);
+      }
+
+      embed.addFields({name: 'Get The Game', value: `[Steam Store](https://store.steampowered.com/app/${gameData.storeId!})`})
       .setImage(`http://cdn.cloudflare.steamstatic.com/steam/apps/${gameData.storeId}/header.jpg`)
 
     return embed;
+  }
+
+  addUsers(users: string[]): EmbeddedGame {
+    this.users = users;
+    return this;
   }
 
   async toJSON(user: string): Promise<APIEmbed> {
