@@ -40,7 +40,7 @@ const interactionEvent: BotEvent = {
 			await command.execute(interaction);
 		} catch (error) {
 			Logger.log('Interaction', `Failed to execute command ${interaction.commandName}. ${error}`);
-			await interaction.reply(`[Interaction] Failed to execute command ${interaction.commandName}.`);
+			await interaction.reply({content: `[Interaction] Failed to execute command ${interaction.commandName}.`, ephemeral: true});
 		}
 	},
 };
