@@ -32,7 +32,7 @@ const link: Command = {
 		});
 		**/
 
-		action.reply({content: `Due to a recently discovered technical bug I have disabled the /link command until it can be fixed. You can still link your accounts from the [Dashboard](${config.baseURL}). \n Sorry for the Inconvenience. I am working on it.`})
+		action.reply({content: `Due to a recently discovered technical bug I have disabled the /link command until it can be fixed. You can still link your accounts from the [Dashboard](${config.baseURL}). \n Sorry for the Inconvenience. I am working on it.`, ephemeral: true});
 	}
 }
 
