@@ -20,7 +20,7 @@ const link: Command = {
 		}
 
 		token = token.data.token;
-/**
+
 		let embed = new EmbedBuilder()
 		.setTitle('Add a Game Library')
 		.setDescription("Link your Discord account with any of these Game Libraries")
@@ -30,9 +30,7 @@ const link: Command = {
 			embeds: [embed],
 			ephemeral: true
 		});
-		**/
-
-		action.reply({content: `Due to a recently discovered technical bug I have disabled the /link command until it can be fixed. You can still link your accounts from the [Dashboard](${config.baseURL}). \n Sorry for the Inconvenience. I am working on it.`, ephemeral: true});
+		
 	}
 }
 
