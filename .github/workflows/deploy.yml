@@ -25,7 +25,7 @@ jobs:
 
       - name: Copy files
         run: |
-          scp -i ~/.ssh/id_rsa -r dist/* vulps@161.97.68.166:/var/gamesync-bot
+          scp -i ~/.ssh/id_rsa -r * vulps@161.97.68.166:/var/gamesync-bot
           scp -i ~/.ssh/id_rsa package.json vulps@161.97.68.166:/var/gamesync-bot
 
       - name: Install dependencies on server and reload
