@@ -1,8 +1,9 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../utils/sequelize.js';
+import sequelize from '../src/utils/sequelize.js';
+import User from './user.js';
 
-const GameUser = sequelize.define(
-  'GameUser',
+const GameAccount = sequelize.define(
+  'GameAccount',
   {
     id: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -14,10 +15,22 @@ const GameUser = sequelize.define(
       allowNull: false,
       field: 'user_id',
     },
-    gameId: {
-      type: DataTypes.BIGINT.UNSIGNED,
+    steamId: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      unique: true,
+      field: 'steam_id',
+    },
+    syncing: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
-      field: 'game_id',
+      defaultValue: false,
+      field: 'syncing',
+    },
+    lastSync: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'last_sync',
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -31,10 +44,12 @@ const GameUser = sequelize.define(
     },
   },
   {
-    tableName: 'game_users',
+    tableName: 'game_accounts',
     timestamps: true,
     underscored: true,
   }
 );
 
-export default GameUser;
+GameAccount.belongsTo(User);
+
+export default GameAccount;

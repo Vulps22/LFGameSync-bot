@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../utils/sequelize.js';
+import sequelize from '../src/utils/sequelize.js';
 import Game from './game.js';
 import LinkToken from './link_token.js';
 import GameAccount from './game_account.js';
