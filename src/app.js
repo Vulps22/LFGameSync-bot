@@ -4,10 +4,13 @@ const DeployCommands = require('./utils/deployCommands.js');
 const Logger = require('./utils/logger.js');
 const EventHandler = require('./utils/eventHandler.js');
 const Config = require('./config.js');
-
+const sequelize = require('./utils/sequelize.js');
 /**
  * https://discord.com/api/oauth2/authorize?client_id=1139301810369204254&permissions=2147601472&scope=bot
  */
+
+//CONFIRM DATABASE CONNECTION
+checkDatabase();
 
 // Logging that the client is starting.
 Logger.log('Client', 'Starting...');
@@ -38,3 +41,14 @@ module.exports = { rest };
 // Create the client and log in.
 const client = createClient();
 client.login(Config.clientToken);
+
+
+async function checkDatabase() {
+	try {
+		await sequelize.authenticate();
+		Logger.log('Database', 'Connection has been established successfully.');
+	} catch (error) {
+		console.error('Database', 'Unable to connect to the database Aborting startup:', error);
+		process.exit(1);
+	}
+}
