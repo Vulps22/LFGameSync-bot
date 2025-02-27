@@ -115,3 +115,5 @@ run/
 
 .env
 dist/
+
+config/config.json
