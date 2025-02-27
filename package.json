@@ -1,11 +1,11 @@
 {
   "name": "lf-game-sync",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "index.js",
+  "type": "commonjs",
   "scripts": {
-    "start": "ts-node ./src/app.ts",
-	"build": "tsc",
+    "start": "node ./src/app.js",
     "test": "jest"
   },
   "keywords": [],
@@ -17,11 +17,6 @@
     "dotenv": "^16.3.1"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.3",
-    "@types/node": "^20.5.0",
-    "jest": "^29.6.2",
-    "ts-node": "^10.9.1",
-    "tslib": "^2.6.1",
-    "typescript": "^5.1.6"
+    "jest": "^29.6.2"
   }
 }

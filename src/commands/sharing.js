@@ -1,38 +1,41 @@
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBooleanOption, SlashCommandBuilder } from "discord.js";
-import { Interaction } from "discord.js";
-import config from '../config'
-import Command from "src/interfaces/Command";
-import axios from "axios";
-import Caller from "../utils/caller";
+const { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBooleanOption, SlashCommandBuilder, Interaction } = require('discord.js');
+const config = require('../config.js');
+const Command = require('../interfaces/Command.js');
+const axios = require('axios');
+const Caller = require('../utils/caller.js');
 
-const link: Command = {
+
+// @ts-check
+
+/** @type {import('../interfaces/Command').Command} */
+const sharing = {
 	data: new SlashCommandBuilder()
 		.setName('sharing')
 		.setDescription('enable/disable sharing')
 		.addBooleanOption(option => option.setName('set')
 			.setDescription('Do you want to turn sharing On or Off?')
-			.setRequired(true)) as SlashCommandBuilder,
-	async execute(interaction: Interaction) {
-		let action = interaction as CommandInteraction;
-		const options = action.options as CommandInteractionOptionResolver;
+			.setRequired(true)),
+	async execute(interaction) {
+		let action = interaction;
+		const options = action.options;
 		let state = options.getBoolean('set');
 
 		const userId = interaction.user.id
 
 		// send server ID, user ID and state to https://gamesync.ajmcallister.co.uk/api/server/set_sharing
 		try {
-			const response = await Caller.setSharing(action.guildId!, action.user.id, state!)
+			const response = await Caller.setSharing(action.guildId, action.user.id, state)
 			const data = response.data;
 			console.log(response.data);
 
 			switch (data.message) {
 
 				case 'Server not found':
-					await Caller.registerServer(action.guildId!, action.guild!.name!, action.guild!.iconURL()!);
+					await Caller.registerServer(action.guildId, action.guild.name, action.guild.iconURL());
 					this.execute(interaction);
 					return;
 				case 'User not Found':
-					await Caller.registerUser(action.guildId!, action.user.id, action.user.username)
+					await Caller.registerUser(action.guildId, action.user.id, action.user.username)
 					this.execute(interaction);
 					return;
 				case 'Sharing Changed':
@@ -51,4 +54,4 @@ const link: Command = {
 	}
 }
 
-module.exports = link;
+module.exports = sharing;

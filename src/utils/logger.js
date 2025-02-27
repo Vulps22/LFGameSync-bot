@@ -2,7 +2,7 @@
  * Gets the current time.
  * @returns {string}
  */
-function getCurrentTime(): string {
+function getCurrentTime() {
 	let date = new Date();
 	// Returns the current time in the format of HH:MM:SS | DD/MM/YYYY
 	// getDate returns the day of the month, getMonth returns the month (0-11), getFullYear returns the year.
@@ -15,11 +15,11 @@ function getCurrentTime(): string {
  * @param prefix {string}
  * @param message {string}
  */
-function log(prefix: string, message: string): void {
+function log(prefix, message) {
 	console.log(`[${getCurrentTime()}] [${prefix}] ${message}`);
 }
 
 // Exports Log Command
-export default {
+module.exports = {
 	log: log,
 };

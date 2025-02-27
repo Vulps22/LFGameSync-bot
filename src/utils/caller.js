@@ -2,12 +2,13 @@
  * All API calls should be placed here for easy access throughout the bot
  */
 
-import config from "../config";
-import logger from "./logger";
+const config = require("../config.js");
+const logger = require("./logger.js");
+
 
 const axios = require('axios');
 
-const handleResponse = (response: any, successMessage: any) => {
+const handleResponse = (response, successMessage) => {
     //console.log(response.data);
 
     // You can customize this part based on your needs
@@ -18,7 +19,7 @@ const handleResponse = (response: any, successMessage: any) => {
     return response;
 };
 
-const handleError = (error: any, errorMessage: any) => {
+const handleError = (error, errorMessage) => {
     console.error('Error in API call:', error);
     logger.log("Error", `error in API Call: ${error}`)
 
@@ -26,8 +27,11 @@ const handleError = (error: any, errorMessage: any) => {
     throw new Error(errorMessage || 'An error occurred during the API call.');
 };
 
+/**
+ * @deprecated We are moving to an MVC architecture which will replace the API entirely. This will be removed in the future.
+ */
 const Caller = {
-    find: async (gameId: string, serverId: string, userId: string) => {
+    find: async (gameId, serverId, userId) => {
         try {
             const response = await axios.get(`${config.baseURL}/api/lfg/find?game_id=${gameId}&server=${serverId}&user_id=${userId}`);
             return handleResponse(response, null);
@@ -36,7 +40,7 @@ const Caller = {
         }
     },
 
-    registerServer: async (id: string, name: string, imageURL: string) => {
+    registerServer: async (id, name, imageURL) => {
         const data = {
             server_id: id,
             server_name: name,
@@ -51,7 +55,7 @@ const Caller = {
         }
     },
 
-    removeServer: async (serverId: string) => {
+    removeServer: async (serverId) => {
         const data = {
             server_id: serverId
         };
@@ -64,7 +68,7 @@ const Caller = {
         }
     },
 
-    setSharing: async (serverId: string, userId: string, state: boolean) => {
+    setSharing: async (serverId, userId, state) => {
         const data = {
             server_id: serverId,
             user_id: userId,
@@ -78,7 +82,7 @@ const Caller = {
             return handleError(error, 'Error in setSharing API call');
         }
     },
-    registerUser: async (serverId: string, userId: string, name: string) => {
+    registerUser: async (serverId, userId, name) => {
         const data = {
             server_id: serverId,
             user_id: userId,
@@ -92,7 +96,7 @@ const Caller = {
             return handleError(error, 'Error in registerUser API call');
         }
     },
-    findGame: async (name: string) => {
+    findGame: async (name) => {
         try {
             const response = await axios.get(`${config.baseURL}/api/lfg/find_game?name=${name}`);
             return handleResponse(response, null);
@@ -100,7 +104,7 @@ const Caller = {
             return handleError(error, 'Error in registerUser API call');
         }
     },
-    getGame: async (id: string) => {
+    getGame: async (id) => {
         try {
             const response = await axios.get(`${config.baseURL}/api/lfg/get_game?id=${id}`);
             return handleResponse(response, null);
@@ -108,7 +112,7 @@ const Caller = {
             return handleError(error, 'Error in registerUser API call');
         }
     },
-    askForToken: async(id: string) => {
+    askForToken: async(id) => {
         try {
             const response = await axios.get(`${config.baseURL}/api/account/link_token?discord_id=${id}`);
             return handleResponse(response, null);
@@ -118,4 +122,4 @@ const Caller = {
     }
 };
 
-export default Caller;
+module.exports = Caller;

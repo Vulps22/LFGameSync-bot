@@ -2,14 +2,18 @@
     help command should list and explain the commands, and offer a short "setup and how to" guide at the top
  */
 // Imports.
-import { CommandInteraction, EmbedBuilder, Interaction, SlashCommandBuilder } from 'discord.js';
-import Command from '../interfaces/Command';
-import config from '../config';
+const { CommandInteraction, EmbedBuilder, Interaction, SlashCommandBuilder } = require('discord.js');
+const Command = require('../interfaces/Command.js');
+const config = require('../config.js');
 
-export const pingCommand: Command = {
+
+// @ts-check
+
+/** @type {import('../interfaces/Command').Command} */
+module.export = pingCommand = {
     data: new SlashCommandBuilder().setName('help').setDescription('commands and instructions!'),
     async execute(interaction) {
-        let action = interaction as CommandInteraction;
+        let action = interaction;
 
         let embed = new EmbedBuilder()
             .setTitle("LFGameSync Help")
