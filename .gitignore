@@ -116,4 +116,5 @@ run/
 .env
 dist/
 
-config/config.json
+# ignore cofig folder
+config/
