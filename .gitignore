@@ -115,3 +115,6 @@ run/
 
 .env
 dist/
+
+# ignore cofig folder
+config/
