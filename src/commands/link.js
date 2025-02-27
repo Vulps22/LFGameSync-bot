@@ -1,16 +1,19 @@
-import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { Interaction } from "discord.js";
-import Command from "src/interfaces/Command";
-import config from '../config'
-import Caller from "../utils/caller";
-import logger from "../utils/logger";
+const { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Interaction } = require('discord.js');
+const Command = require('../interfaces/Command.js');
+const config = require('../config.js');
+const Caller = require('../utils/caller.js');
+const logger = require('../utils/logger.js');
 
-const link: Command = {
+
+// @ts-check
+
+/** @type {import('../interfaces/Command').Command} */
+const link = {
 	data: new SlashCommandBuilder()
 		.setName('link')
 		.setDescription('Link your Discord to a Game Library'),
-	async execute(interaction: Interaction) {
-		let action = interaction as CommandInteraction;
+	async execute(interaction) {
+		let action = interaction;
 
 		let token = await Caller.askForToken(action.user.id);
 

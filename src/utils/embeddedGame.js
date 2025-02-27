@@ -1,22 +1,23 @@
-import { APIEmbed, APIEmbedField, EmbedBuilder, RestOrArray } from 'discord.js';
+const { APIEmbed, APIEmbedField, EmbedBuilder, RestOrArray } = require('discord.js');
 
-import Game from '../interfaces/game';
-import Caller from '../utils/caller';
-import { exit } from 'process';
+const Game = require('../interfaces/game');
+const Caller = require('./caller');
+const { exit } = require('process');
+
 
 class EmbeddedGame {
-  private gameId: string;
-  private users: string[];
+  gameId;
+  users;
 
-  constructor(gameId: string) {
+  constructor(gameId) {
     this.gameId = gameId;
     this.users = [];
   }
 
-  async fetchGameData(): Promise<Game | null> {
+  async fetchGameData() {
     try {
       const gameData = await Caller.getGame(this.gameId);
-        const game = gameData.data as Game;
+        const game = gameData.data;
         
       if(!game.id) throw new Error("Game ID Missing");
       if(!game.name) throw new Error("Game Name Missing");
@@ -31,7 +32,7 @@ class EmbeddedGame {
     }
   }
 
-  async buildEmbed(user: string): Promise<EmbedBuilder | null> {
+  async buildEmbed(user) {
     const gameData = await this.fetchGameData();
 
     if (!gameData) {
@@ -47,25 +48,25 @@ class EmbeddedGame {
       
       //if there are users to tag
       if(this.users.length > 0){
-        const fields: RestOrArray<APIEmbedField> = [];
+        const fields = [];
         this.users.forEach(userId => {
           fields.push({name: ' ', value: `- <@${userId}>`})
         });
         embed.addFields(fields);
       }
 
-      embed.addFields({name: 'Get The Game', value: `[Steam Store](https://store.steampowered.com/app/${gameData.storeId!})`})
+      embed.addFields({name: 'Get The Game', value: `[Steam Store](https://store.steampowered.com/app/${gameData.storeId})`})
       .setImage(`http://cdn.cloudflare.steamstatic.com/steam/apps/${gameData.storeId}/header.jpg`)
 
     return embed;
   }
 
-  addUsers(users: string[]): EmbeddedGame {
+  addUsers(users) {
     this.users = users;
     return this;
   }
 
-  async toJSON(user: string): Promise<APIEmbed> {
+  async toJSON(user) {
     const embed = await this.buildEmbed(user);
     
     if (!embed) {
@@ -77,4 +78,4 @@ class EmbeddedGame {
   }
 }
 
-export default EmbeddedGame;
+module.exports = EmbeddedGame;

@@ -1,20 +1,20 @@
-// Imports
-import { REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from 'discord.js';
-import Command from '../interfaces/Command';
-import commandHandler from './commandHandler';
-import * as fileSystem from 'fs';
-import * as filePath from 'path';
-import Logger from './logger';
-import config from '../config';
+const { REST, Routes } = require('discord.js');
+const Command = require('../interfaces/Command.js');
+const commandHandler = require('./commandHandler.js');
+const fileSystem = require('fs');
+const filePath = require('path');
+const Logger = require('./logger.js');
+const config = require('../config.js');
 
-export default {
+
+module.exports = {
 	/**
 	 * Creates a JSON representation of all registered Commands for global deployment.
-	 * @returns {RESTPostAPIChatInputApplicationCommandsJSONBody[]} The JSON body for the deployment.
+	 * @returns {[]} The JSON body for the deployment.
 	 */
 	getDeploymentJson: function () {
 		// Creates new collection for commands.
-		const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+		const commands = [];
 
 		const commandList = commandHandler.getCommands();
 
@@ -37,7 +37,7 @@ export default {
 	 * PUTs the global commands to Discord.
 	 * @param rest The REST object to use for deployment.
 	 */
-	deployCommands: async function (rest: REST) {
+	deployCommands: async function (rest) {
 		console.log('Started refreshing application (/) commands.');
 
 		const data = await rest.put(
@@ -50,7 +50,7 @@ export default {
 				Routes.applicationCommands(config.clientId),
 			).then((commandsList) => {
 				// Creates new collection for commands.
-				const commands: Command[] = commandsList as Command[];
+				const commands = commandsList;
 				console.log(`${commands.length} global commands registered.`);
 			});
 		});

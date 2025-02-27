@@ -1,9 +1,12 @@
+const Caller = require('../utils/caller.js');
+const BotEvent = require('../interfaces/botEvent.js');
 
-import Caller from "../utils/caller";
-import BotEvent from "../interfaces/botEvent";
+// @ts-check
 
-
-const BotJoinEvent: BotEvent = {
+/**
+ * @type {BotEvent}
+ */
+const BotJoinEvent = {
 	name: "guildCreate",
 	once: false,
 	async execute(guild) {

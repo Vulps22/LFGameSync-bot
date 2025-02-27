@@ -1,31 +1,34 @@
-import { Client } from "discord.js";
-import path from "path";
-import fs from "fs";
-import Logger from "./logger";
-import BotEvent from "../interfaces/botEvent";
+const { Client } = require('discord.js');
+const path = require('path');
+const fs = require('fs');
+const Logger = require('./logger.js');
+const BotEvent = require('../interfaces/botEvent.js');
 
-export default {
+module.exports = {
 	/**
 	 * Registers all the events in the events folder.
 	 * @param client {Client}
 	 */
-	registerEvents: function (client: Client) {
+	registerEvents: function (client) {
 		console.log("=============================================");
 		console.log("              EVENT HANDLER");
 		console.log("=============================================");
 		console.log("Registering events...");
 
 		// Gets all event files - Filters out non .js files.
-		const eventsPath: string = path.join(__dirname, "..", "events");
+		const eventsPath = path.join(__dirname, "..", "events");
 		Logger.log("EventHandler", `Loading events from ${eventsPath}.`);
-		const eventFiles: string[] = fs.readdirSync(eventsPath).filter((file: string) => {
+		const eventFiles = fs.readdirSync(eventsPath).filter((file) => {
 				return file.endsWith(".js") || file.endsWith(".ts");
 			});
 		console.log("Found " + eventFiles.length + " events.")
 		// Loads all the events in the events folder.
 		for (const file of eventFiles) {
-			const eventPath: string = path.join(eventsPath, file);
-			const event: BotEvent = require(eventPath);
+			const eventPath = path.join(eventsPath, file);
+			/**
+			 * @type {BotEvent}
+			 */
+			const event = require(eventPath);
 
 			if (event.once) {
 				console.log("Registering once event..." + event.name)

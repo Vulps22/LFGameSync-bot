@@ -1,27 +1,27 @@
-import { Client } from "discord.js";
-import  Command  from "src/interfaces/Command"
-import logger from "./logger";
+const { Client } = require("discord.js");
+const Command = require("../interfaces/Command.js");
+const logger = require("./logger.js");
 // Imports
-const fileSystem = require('node:fs');
-const filePath = require('node:path');
+const fileSystem = require("node:fs");
+const filePath = require("node:path");
 
 
 
 // Define the commands array
-const commands: Map<string, Command> = new Map();
+const commands = new Map();
 
 
-export default {
+module.exports = {
 
 	/**
 	 * Gets all the commands in the commands folder.
 	 * @param client {Client}
 	 */
-	registerCommands: function(client: Client) {
+	registerCommands: function(client) {
 
 		// Gets all command files - Filters out non .js files.
 		const commandsPath = filePath.join(__dirname, "..", "commands");
-		let commandFiles: string[] = fileSystem.readdirSync(commandsPath).filter((file: string) => {
+		let commandFiles = fileSystem.readdirSync(commandsPath).filter((file) => {
 			return file.endsWith(".js") || file.endsWith(".ts");
 		});	
 

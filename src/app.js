@@ -1,16 +1,13 @@
-// Imports.
-import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
-import CommandHandler from './utils/commandHandler';
-import DeployCommands from './utils/deployCommands';
-import Logger from './utils/logger';
-import EventHandler from './utils/eventHandler';
-import Config from './config';
+const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
+const CommandHandler = require('./utils/commandHandler.js');
+const DeployCommands = require('./utils/deployCommands.js');
+const Logger = require('./utils/logger.js');
+const EventHandler = require('./utils/eventHandler.js');
+const Config = require('./config.js');
 
 /**
  * https://discord.com/api/oauth2/authorize?client_id=1139301810369204254&permissions=2147601472&scope=bot
  */
-
-
 
 // Logging that the client is starting.
 Logger.log('Client', 'Starting...');
@@ -36,7 +33,7 @@ function createClient() {
 const rest = new REST().setToken(Config.clientToken);
 
 //export rest
-export { rest };
+module.exports = { rest };
 
 // Create the client and log in.
 const client = createClient();
