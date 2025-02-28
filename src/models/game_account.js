@@ -30,6 +30,11 @@ class GameAccount extends Model {
     });
   }
 
+
+  async sync() {
+    
+  }
+
 }
 
 // Initialize the GameAccount model

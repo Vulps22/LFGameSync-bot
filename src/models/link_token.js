@@ -34,6 +34,7 @@ LinkToken.init(
     token: {
       type: DataTypes.STRING(255),
       allowNull: false,
+      unique: true,
       primaryKey: true,
     },
     userId: {

@@ -1,5 +1,7 @@
-const { DataTypes, Model } = require('sequelize');
+const crypto = require('crypto');
+const { DataTypes, Model, Op } = require('sequelize');
 const sequelize = require('../utils/sequelize.js');
+const LinkToken = require('./link_token.js');
 
 /**
  * @typedef {Object} UserAttributes
@@ -38,12 +40,49 @@ class User extends Model {
    * @returns {Promise<boolean>}
    */
   async isLinked() {
-    
+
     const gameAccount = await this.getGameAccount();
     console.log(gameAccount.toJSON());
     return gameAccount && gameAccount.steamId !== null;
 
   }
+
+  async createLinkToken(userId) {
+    let token;
+    let linkToken;
+
+    // Retry in case of unique constraint failure
+    for (let i = 0; i < 5; i++) {
+      token = crypto.randomBytes(32).toString('hex'); // Increased randomness
+
+      try {
+        linkToken = await LinkToken.create({
+          token: token,
+          userId: this.id,
+          expires: new Date(Date.now() + 15 * 60 * 1000),
+        });
+        break; // Success, exit loop
+      } catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+          console.warn('Token collision detected, retrying...');
+          continue; // Try again with a new token
+        }
+        throw error; // Other errors should be reported
+      }
+    }
+
+    if (!linkToken) throw new Error('Failed to generate a unique link token after 5 attempts');
+
+    // Cleanup expired tokens
+    await LinkToken.destroy({
+      where: {
+        expires: { [Op.lt]: new Date() },
+      },
+    });
+
+    return linkToken;
+  }
+
 
   /**
    * 
@@ -63,7 +102,7 @@ class User extends Model {
       foreignKey: 'userId',
       as: 'serverUsers',
     });
-    
+
 
     User.belongsToMany(db.Game, {
       through: 'GameUser',
