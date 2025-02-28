@@ -39,8 +39,24 @@ class User extends Model {
    */
   static associate = (db) => {
     console.log(db);
-    User.belongsToMany(db.DiscordServer, { through: 'DiscordServerUser' });
-    User.belongsToMany(db.Game, { through: 'GameUser' });
+
+    User.belongsToMany(db.DiscordServer, {
+      through: db.DiscordServerUser,  // Use the actual model, not just a string
+      foreignKey: 'userId',
+      otherKey: 'serverId',
+    });
+
+    //define relationship to DiscordServerUser
+    User.hasMany(db.DiscordServerUser, {
+      foreignKey: 'userId',
+      as: 'serverUsers',
+    });
+    
+
+    User.belongsToMany(db.Game, {
+      through: 'GameUser',
+    });
+
     User.hasMany(db.GameAccount);
   };
 }
@@ -77,10 +93,12 @@ User.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: true,
+      defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
+      defaultValue: DataTypes.NOW,
     },
   },
   {

@@ -37,7 +37,7 @@ LinkToken.init(
       primaryKey: true,
     },
     userId: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       field: 'user_id',
     },
@@ -49,11 +49,13 @@ LinkToken.init(
       type: DataTypes.DATE,
       allowNull: true,
       field: 'created_at',
+      defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
       field: 'updated_at',
+      defaultValue: DataTypes.NOW,
     },
   },
   {

@@ -70,11 +70,13 @@ PersonalAccessToken.init(
       type: DataTypes.DATE,
       allowNull: true,
       field: 'created_at',
+      defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
       field: 'updated_at',
+      defaultValue: DataTypes.NOW,
     },
   },
   {

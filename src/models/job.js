@@ -50,11 +50,13 @@ Job.init(
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       field: 'available_at',
+      defaultValue: DataTypes.NOW,
     },
     createdAt: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       field: 'created_at',
+      defaultValue: DataTypes.NOW,
     },
   },
   {

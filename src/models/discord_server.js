@@ -23,7 +23,12 @@ const User = require('./user.js'); // Assuming the User model is already defined
 class DiscordServer extends Model {
 
   static associate(db) {
-    DiscordServer.belongsToMany(db.User, { through: 'DiscordServerUser' });
+    DiscordServer.belongsToMany(db.User, {
+      through: db.DiscordServerUser,  // Use the actual model, not just a string
+      foreignKey: 'serverId',  // Explicitly specify the foreign key for the DiscordServer
+      otherKey: 'userId',      // Explicitly specify the foreign key for the User
+    });
+    
   }
 }
 
