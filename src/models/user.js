@@ -1,10 +1,50 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../src/utils/sequelize.js';
-import Game from './game.js';
-import LinkToken from './link_token.js';
-import GameAccount from './game_account.js';
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../utils/sequelize.js');
 
-class User extends Model {}
+/**
+ * @typedef {Object} UserAttributes
+ * @property {number} id
+ * @property {string} discordId
+ * @property {string} discordName
+ * @property {string} [discordAccessToken]
+ * @property {Date} [discordTokenExpires]
+ * @property {string} [discordRefreshToken]
+ * @property {Date} [createdAt]
+ * @property {Date} [updatedAt]
+ */
+
+/**
+ * @typedef {Model<UserAttributes>} UserInstance
+ */
+
+/**
+ * @class User
+ * @extends Model
+ */
+class User extends Model {
+  /**
+   * @returns {Promise<UserInstance[]>}
+   */
+  static async findByDiscordId(discordId) {
+    return await this.findAll({
+      where: {
+        discordId: discordId,
+      },
+    });
+  }
+
+  /**
+   * 
+   * @param {Model[]} db 
+   */
+  static associate = (db) => {
+    console.log(db);
+    User.belongsToMany(db.DiscordServer, { through: 'DiscordServerUser' });
+    User.hasMany(db.Game, { through: 'GameUser' });
+    User.hasMany(db.LinkToken);
+    User.hasMany(db.GameAccount);
+  };
+}
 
 User.init(
   {
@@ -53,9 +93,4 @@ User.init(
   }
 );
 
-User.belongsToMany(DiscordServer, { through: 'DiscordServerUser' });
-User.hasMany(Game, { through: 'GameUser' });
-User.hasMany(LinkToken);
-User.hasMany(GameAccount);
-
-export default User;
+module.exports = User;
