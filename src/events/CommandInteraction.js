@@ -4,8 +4,7 @@ const Logger = require('../utils/logger.js');
 const commandHandler = require('../utils/commandHandler.js');
 const Command = require('../interfaces/Command.js');
 const { sendTo } = require('../utils/notify.js');
-const DiscordServer = require('../models/discord_server.js');
-const User = require("../models/user.js");
+const {User, DiscordServer, DiscordServerUser, GameAccount} = require('../models');
 
 
 // @ts-check
@@ -100,8 +99,8 @@ async function checkServer(interaction) {
  * @param {Interaction} interaction 
  */
 async function checkUser(interaction) {
-	const user = interaction.user;
-	const discordId = user.id;
+	const InteractionUser = interaction.user;
+	const discordId = InteractionUser.id;
 
 	// Check if the user exists
 	const dbUser = await User.findOne({
@@ -113,16 +112,19 @@ async function checkUser(interaction) {
 	if (!dbUser) {
 		const user = await User.create({
 			discordId: discordId,
-			discordName: user.username,
+			discordName: InteractionUser.username,
 		});
+		await GameAccount.create({
+			userId: user.id,
+		})
 		await DiscordServerUser.create({
 			serverId: interaction.guildId,
 			userId: user.id,
 		});
 	} else {
 		// Update the user's name if it has changed
-		if (dbUser.discordName !== user.username) {
-			dbUser.discordName = user.username;
+		if (dbUser.discordName !== InteractionUser.username) {
+			dbUser.discordName = InteractionUser.username;
 			await dbUser.save();
 		}
 	}
