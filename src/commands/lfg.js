@@ -4,8 +4,9 @@ const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder
 const Command = require('../interfaces/Command.js');
 const config = require('../config.js');
 const Caller = require('../utils/caller.js');
-const Game = require('../models/game.js');
 const EmbeddedGame = require('../utils/embeddedGame.js');
+const { Game, GameUser, DiscordServer, DiscordServerUser, User } = require('../models'); // Adjust the import path if necessary
+
 
 
 // @ts-check
@@ -26,7 +27,7 @@ const lfgCommand = {
 		const name = action.options.getFocused();
 
 		const games = await Game.search(name);
-		
+
 		action.respond(games.map((game) => ({ name: game.name, value: String(game.id) })));
 	},
 
@@ -43,23 +44,9 @@ const lfgCommand = {
 		}
 
 		try {
-			const data = await Caller.find(gameId, serverId, userId);
 
-			switch (data.data) {
-				case 'Not Sharing':
-					await action.reply({ content: `Use /sharing, or visit the [Dashboard](${config.baseURL}) to turn on Library Sharing for this server to continue.`, ephemeral: true });
-					return;
-				case 'Server not found':
-					await Caller.registerServer(serverId, action.guild.name, action.guild.iconURL() ?? '');
-					this.execute(interaction);
-					return;
-				case 'Server User not Registered':
-					await Caller.registerUser(serverId, userId, action.user.username);
-					this.execute(interaction);
-					return;
-			}
 
-			const users = data.data['data'] ?? [];
+			const users = await findPlayers(gameId, serverId, userId);
 
 			if (users.length === 0) {
 				await action.reply({ content: 'No users found with that game', ephemeral: true });
@@ -70,13 +57,13 @@ const lfgCommand = {
 				.setPlaceholder('Select a user to message')
 				.setMinValues(1)
 				.setMaxValues(users.length);
+			console.log("Users", users);
 			selectMenu.addOptions(users.map((user) => {
 				return new StringSelectMenuOptionBuilder()
-					.setLabel(user.discord_name)
-					.setValue(user.discord_id)
-					.setDescription(user.discord_name);
+					.setLabel(user.discordName)
+					.setValue(user.discordId)
+					.setDescription(user.discordName);
 			}));
-
 
 			const openRequestButton = new ButtonBuilder()
 				.setCustomId('open_request')
@@ -97,28 +84,32 @@ const lfgCommand = {
 			});
 
 			const collectorFilter = (interaction) =>
-				interaction.user.id === interaction.user.id;
+				interaction.user.id === userId;
 
 			const selection = await response.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
-			const gameData = await Caller.getGame(gameId);
-			const game = gameData.data;
+			const game = await Game.findByPk(gameId);
+
+			if (!game) {
+				await action.reply({ content: 'Game not found', ephemeral: true });
+				return;
+			}
 
 			if (selection.isStringSelectMenu()) {
 				const selectedValues = selection.values;
 
 				// Build the username string
 				const selectedUserNames = users
-					.filter((user) => selectedValues.includes(user.discord_id))
-					.map((user) => user.discord_id);
+					.filter((user) => selectedValues.includes(user.discordId))
+					.map((user) => user.discordId);
 
 				action.deleteReply();
-				
+
 				const embeddedGame = new EmbeddedGame(String(game.id));
 				embeddedGame.addUsers(selectedUserNames);
 
 				const gameEmbed = await embeddedGame.toJSON(interaction.user.id)
 
-				action.channel?.send({embeds: [gameEmbed]})
+				action.channel?.send({ embeds: [gameEmbed] })
 			} else if (selection.isButton() && selection.customId === 'open_request') {
 
 				const embeddedGame = new EmbeddedGame(String(game.id));
@@ -134,5 +125,81 @@ const lfgCommand = {
 		}
 	},
 };
+
+
+/**
+ * Finds players who own a specified game and are sharing their library in a specific server.
+ * 
+ * @param {number} gameId - The ID of the game to search for.
+ * @param {string} serverId - The ID of the server to check for sharing.
+ * @param {string} userId - The Discord user ID requesting the information.
+ * @returns {Promise<User[]>} - A promise that resolves with an array of users.
+ */
+async function findPlayers(gameId, serverId, userId) {
+	try {
+
+		//step 1: find the server and user
+		const server = await DiscordServer.findOne({
+			where: {
+				discordId: serverId,
+			},
+		});
+
+		if (!server) {
+			return "Server not found";
+		}
+
+		const user = await User.findOne({
+			where: {
+				discordId: userId,
+			},
+		});
+
+		if (!user) {
+			return "User not found";
+		}
+
+		// Step 2: Find the Game
+		const game = await Game.findByPk(gameId);
+		if (!game) {
+			return "Game not found";
+		}
+
+		// Step 3: Find the Server-User Relationship for Sharing Library
+		const serverUser = await DiscordServerUser.findOne({
+			where: {
+				serverId: server.id,
+				userId: user.id,
+			},
+		});
+
+		console.log(serverUser);
+
+		if(!serverUser) {
+			throw new Error('Requesting User not found in server');
+		}
+
+		if (!serverUser.shareLibrary) {
+			return "Not Sharing"; // User is not sharing their library
+		}
+
+		// Step 4: Find Users Who Own the Game and Are Sharing in the Server
+		const users = await User.findAll({
+			include: 
+				{
+					model: DiscordServerUser,
+					as: 'serverUsers',
+					where: { serverId: server.id, shareLibrary: true }, // Ensure they are sharing the library
+				},
+		});
+
+		return users; // List of users who own the game and share their library in the specified server
+	} catch (error) {
+		console.error("Error finding players:", error);
+		throw new Error("Error finding players");
+	}
+}
+
+
 
 module.exports = lfgCommand;
