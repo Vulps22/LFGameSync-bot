@@ -111,9 +111,13 @@ async function checkUser(interaction) {
 	});
 
 	if (!dbUser) {
-		await User.create({
+		const user = await User.create({
 			discordId: discordId,
 			discordName: user.username,
+		});
+		await DiscordServerUser.create({
+			serverId: interaction.guildId,
+			userId: user.id,
 		});
 	} else {
 		// Update the user's name if it has changed
