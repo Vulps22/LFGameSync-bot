@@ -28,10 +28,9 @@ module.export = pingCommand = {
             ])
             //command descriptions
             .addFields([
-                { name: '**/dashboard**', value: '> Get a link to the LFGameSync website where you can manage your linked accounts and server access' },
                 { name: '**/help**', value: '> Show this help message' },
                 { name: '**/lfg**', value: '> Find a list of all the server members who own the specified game. The Auto Complete will only show games LFGameSync users currently own' },
-                { name: '**/link**', value: '> Quick access to the `Account Manager`, where you can link your game accounts without signing in' },
+                { name: '**/link**', value: '> Get a Steam login to pair our game library with your Discord account' },
                 { name: '**/sharing**', value: '> Enable or disable sharing on this specific server. Sharing is required to use the `/lfg` command. When disabled, you will not appear in any `/lfg` searches on this server' },
                 {name: ' ', value: ' '},
             ])
