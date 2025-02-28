@@ -57,7 +57,7 @@ const lfgCommand = {
 				.setPlaceholder('Select a user to message')
 				.setMinValues(1)
 				.setMaxValues(users.length);
-			console.log("Users", users);
+
 			selectMenu.addOptions(users.map((user) => {
 				return new StringSelectMenuOptionBuilder()
 					.setLabel(user.discordName)
@@ -85,8 +85,12 @@ const lfgCommand = {
 
 			const collectorFilter = (interaction) =>
 				interaction.user.id === userId;
-
-			const selection = await response.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
+			try {
+				const selection = await response.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
+			} catch (error) {
+				//drop down timed out, we don't need to do anything except end the function
+				return;
+			}
 			const game = await Game.findByPk(gameId);
 
 			if (!game) {
@@ -173,9 +177,7 @@ async function findPlayers(gameId, serverId, userId) {
 			},
 		});
 
-		console.log(serverUser);
-
-		if(!serverUser) {
+		if (!serverUser) {
 			throw new Error('Requesting User not found in server');
 		}
 
@@ -185,12 +187,12 @@ async function findPlayers(gameId, serverId, userId) {
 
 		// Step 4: Find Users Who Own the Game and Are Sharing in the Server
 		const users = await User.findAll({
-			include: 
-				{
-					model: DiscordServerUser,
-					as: 'serverUsers',
-					where: { serverId: server.id, shareLibrary: true }, // Ensure they are sharing the library
-				},
+			include:
+			{
+				model: DiscordServerUser,
+				as: 'serverUsers',
+				where: { serverId: server.id, shareLibrary: true }, // Ensure they are sharing the library
+			},
 		});
 
 		return users; // List of users who own the game and share their library in the specified server
