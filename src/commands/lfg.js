@@ -4,12 +4,13 @@ const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder
 const Command = require('../interfaces/Command.js');
 const config = require('../config.js');
 const Caller = require('../utils/caller.js');
-const Game = require('../interfaces/game.js');
+const Game = require('../models/game.js');
 const EmbeddedGame = require('../utils/embeddedGame.js');
+
 
 // @ts-check
 
-/** @type {import('../interfaces/Command').Command} */
+/** @type {Command} */
 const lfgCommand = {
 	data: new SlashCommandBuilder()
 		.setName('lfg')
@@ -24,8 +25,9 @@ const lfgCommand = {
 
 		const name = action.options.getFocused();
 
-		const games = await Caller.findGame(name);
-		action.respond(games.data.map((game) => ({ name: game.name, value: String(game.id) })));
+		const games = await Game.search(name);
+		
+		action.respond(games.map((game) => ({ name: game.name, value: String(game.id) })));
 	},
 
 	async execute(interaction) {
