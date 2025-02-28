@@ -34,6 +34,18 @@ class User extends Model {
   }
 
   /**
+   * Check if the user's GameAccount is linked to a Steam account.
+   * @returns {Promise<boolean>}
+   */
+  async isLinked() {
+    
+    const gameAccount = await this.getGameAccount();
+    console.log(gameAccount.toJSON());
+    return gameAccount && gameAccount.steamId !== null;
+
+  }
+
+  /**
    * 
    * @param {Model[]} db 
    */
@@ -57,8 +69,9 @@ class User extends Model {
       through: 'GameUser',
     });
 
-    User.hasMany(db.GameAccount);
+    User.hasOne(db.GameAccount);
   };
+
 }
 
 User.init(

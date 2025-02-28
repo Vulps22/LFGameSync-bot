@@ -3,6 +3,7 @@ const config = require('../config.js');
 const Command = require('../interfaces/Command.js');
 const axios = require('axios');
 const Caller = require('../utils/caller.js');
+const { DiscordServerUser, User } = require('../models'); // Adjust the import path if necessary
 
 
 // @ts-check
@@ -22,28 +23,29 @@ const sharing = {
 
 		const userId = interaction.user.id
 
-		// send server ID, user ID and state to https://gamesync.ajmcallister.co.uk/api/server/set_sharing
+		//Enable sharing for the DiscordServerUser belonging to User 
 		try {
-			const response = await Caller.setSharing(action.guildId, action.user.id, state)
-			const data = response.data;
-			console.log(response.data);
 
-			switch (data.message) {
-
-				case 'Server not found':
-					await Caller.registerServer(action.guildId, action.guild.name, action.guild.iconURL());
-					this.execute(interaction);
-					return;
-				case 'User not Found':
-					await Caller.registerUser(action.guildId, action.user.id, action.user.username)
-					this.execute(interaction);
-					return;
-				case 'Sharing Changed':
-					break;
+			const discordServerUser = await DiscordServerUser.findOne({
+				include: {
+					model: User,
+					as: 'user',
+					where: { discordId: userId }
+				}
+			});
+			
+			if (!discordServerUser) {
+				console.error(`DiscordServerUser entry not found for Discord ID ${userId}.`);
 			}
+			
+			discordServerUser.shareLibrary = state;
+			await discordServerUser.save();
+
+			const user = await discordServerUser.getUser()			
+			const userLinked = await user.isLinked();
 
 			action.reply({
-				content: `Game Library Sharing has been ${state === true ? 'enabled' : 'disabled'} on this server ${data.isLinked ? '' : 'but you have not linked your Steam Library. Visit the [Dashboard](' + config.baseURL + ') to sync your games with the bot'}`,
+				content: `Game Library Sharing has been ${state === true ? 'enabled' : 'disabled'} on this server ${ userLinked ? '' : 'but you have not linked your Steam Library. Run /link to sync your games with the bot'}`,
 				ephemeral: true
 			});
 		} catch (error) {
