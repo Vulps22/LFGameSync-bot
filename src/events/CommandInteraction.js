@@ -35,6 +35,7 @@ const interactionEvent = {
 		try {
 			await command.execute(interaction);
 		} catch (error) {
+			console.log(error);
 			Logger.log('Interaction', `Failed to execute command ${interaction.commandName}. ${error}`);
 			await interaction.reply({ content: `[Interaction] Failed to execute command ${interaction.commandName}.`, ephemeral: true });
 		}
