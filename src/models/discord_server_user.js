@@ -62,12 +62,12 @@ DiscordServerUser.init(
       defaultValue: false,
     },
     createdAt: {
-      type: DataTypes.TIMESTAMP,
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: DataTypes.NOW,
     },
     updatedAt: {
-      type: DataTypes.TIMESTAMP,
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: DataTypes.NOW,
     },

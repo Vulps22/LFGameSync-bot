@@ -34,6 +34,7 @@ class Game extends Model {
           [Op.like]: `%${name}%`, // LIKE %name%
         },
       },
+      limit: 20,
     });
   }
 

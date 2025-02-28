@@ -40,8 +40,7 @@ class User extends Model {
   static associate = (db) => {
     console.log(db);
     User.belongsToMany(db.DiscordServer, { through: 'DiscordServerUser' });
-    User.hasMany(db.Game, { through: 'GameUser' });
-    User.hasMany(db.LinkToken);
+    User.belongsToMany(db.Game, { through: 'GameUser' });
     User.hasMany(db.GameAccount);
   };
 }

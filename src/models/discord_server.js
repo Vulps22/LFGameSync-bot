@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../utils/sequelize.js');
-const User = require('./user'); // Assuming the User model is already defined
+const User = require('./user.js'); // Assuming the User model is already defined
 
 /**
  * @typedef {Object} DiscordServerAttributes
@@ -23,7 +23,7 @@ const User = require('./user'); // Assuming the User model is already defined
 class DiscordServer extends Model {
 
   static associate(db) {
-    DiscordServer.hasMany(db.User, { through: 'DiscordServerUser' });
+    DiscordServer.belongsToMany(db.User, { through: 'DiscordServerUser' });
   }
 }
 
@@ -49,12 +49,12 @@ DiscordServer.init(
       allowNull: true,
     },
     createdAt: {
-      type: DataTypes.TIMESTAMP,
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: DataTypes.NOW,
     },
     updatedAt: {
-      type: DataTypes.TIMESTAMP,
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: DataTypes.NOW,
     },
