@@ -21,7 +21,8 @@
     "express": "^4.21.2",
     "mysql2": "^3.12.0",
     "node-steam-openid": "^2.0.0",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "steamapi": "^3.0.12"
   },
   "devDependencies": {
     "jest": "^29.6.2",
