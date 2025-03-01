@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require('discord.js');
-const config = require('../config.js');
 const Command = require('../interfaces/Command.js');
 const axios = require('axios');
 const { DiscordServerUser, User } = require('../models'); // Adjust the import path if necessary
