@@ -2,15 +2,13 @@ const { SlashCommandBuilder } = require('discord.js');
 const SteamAuth = require('node-steam-openid');
 const { User, LinkToken } = require('../models');
 
-const baseURL = process.env.LINK_BASE_URL;
-
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('link')
     .setDescription('Link your Steam account to your Discord account'),
 
   async execute(interaction) {
+    const baseURL = my.linkBaseUrl;
     const discordId = interaction.user.id;
     //This is a sequelize model
     const user = await User.findOne({
@@ -33,7 +31,7 @@ module.exports = {
     const steam = new SteamAuth({
       realm: `${baseURL}`, // Match this with your previous config
       returnUrl: `${baseURL}/auth/steam/callback?token=${link.token}`,
-      apiKey: process.env.STEAM_API_KEY,
+      apiKey: my.steamApiKey,
   });
     // Generate Steam login URL
     const loginUrl = await steam.getRedirectUrl();

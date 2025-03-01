@@ -46,7 +46,7 @@ class GameAccount extends Model {
     const { GameUser, Game } = require('./'); // Import here to avoid circular dependency
 
 
-    const steam = new SteamAPI(process.env.STEAM_API_KEY);
+    const steam = new SteamAPI(my.steamApiKey); 
 
     /** @type { User } */
     const user = await this.getUser();
