@@ -6,7 +6,6 @@ const filePath = require('path');
 const Logger = require('./logger.js');
 const config = require('../config.js');
 
-
 module.exports = {
 	/**
 	 * Creates a JSON representation of all registered Commands for global deployment.
@@ -37,8 +36,10 @@ module.exports = {
 	 * PUTs the global commands to Discord.
 	 * @param rest The REST object to use for deployment.
 	 */
-	deployCommands: async function (rest) {
+	deployCommands: async function () {
 		Logger.log('Started refreshing application (/) commands.');
+
+		const rest = new REST().setToken(my.token);
 
 		const data = await rest.put(
 			Routes.applicationCommands(config.clientId),

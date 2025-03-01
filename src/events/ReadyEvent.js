@@ -3,7 +3,6 @@ const BotEvent = require("../interfaces/botEvent.js");
 const { Client, Events } = require('discord.js');
 const Logger = require('../utils/logger.js');
 const DeployCommands = require('../utils/deployCommands.js');
-const { rest } = require('../app.js');
 
 
 // @ts-check
@@ -22,7 +21,7 @@ const readyEvent = {
 		// Deploying Commands.
 		(async () => {
 			try {
-				DeployCommands.deployCommands(rest);
+				DeployCommands.deployCommands();
 				console.warn("Commands not deployed: Deployment Disabled. Please deploy them manually.");
 			} catch (error) {
 				Logger.error(error);

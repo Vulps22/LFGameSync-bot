@@ -5,76 +5,60 @@ const CommandHandler = require('./utils/commandHandler.js');
 const DeployCommands = require('./utils/deployCommands.js');
 const Logger = require('./utils/logger.js');
 const EventHandler = require('./utils/eventHandler.js');
-const Config = require('./config.js');
 const sequelize = require('./utils/sequelize.js');
+const { Config } = require('./models/');
 const express = require('express');
 
+(async function main() {
+  // Confirm database connection.
+  await checkDatabase();
+  await initConfig();
 
+  // Logging that the client is starting.
+  Logger.debug('Client Starting with Config:', my);
 
-/**
- * https://discord.com/api/oauth2/authorize?client_id=1139301810369204254&permissions=2147601472&scope=bot
- */
-
-//CONFIRM DATABASE CONNECTION
-checkDatabase();
-
-// Logging that the client is starting.
-Logger.log('Client Starting...');
-
-Logger.error('Testing Error Log Color:', [1, 2, 3, 4]);
-Logger.debug('Testing Debug Log Color:', [1, 2, 3, 4]);
-
-// Create a new instance of the Client class and register events and commands.
-function createClient() {
-	const client = new Client({
-		intents: [
-			GatewayIntentBits.Guilds,
-			GatewayIntentBits.GuildMessages,
-			GatewayIntentBits.GuildMessageReactions,
-		],
-		allowedMentions: { parse: ['users', 'roles'], repliedUser: true },
-	});
-
-	EventHandler.registerEvents(client);
-	CommandHandler.registerCommands(client);
-
-	return client;
-}
-
-// REST.
-const rest = new REST().setToken(Config.clientToken);
-
-//export rest
-module.exports = { rest };
-
-global.my = {
-	client: createClient(),
-}
-
-
-my.client.login(Config.clientToken);
-
-startServer();
+  my.client.login(my.token);
+  startServer();
+})();
 
 async function checkDatabase() {
-	try {
-		await sequelize.authenticate();
-		Logger.log('Database', 'Connection has been established successfully.');
-	} catch (error) {
-		Logger.error('Database', 'Unable to connect to the database Aborting startup:', error);
-		process.exit(1);
-	}
+  try {
+    await sequelize.authenticate();
+    Logger.log('Database', 'Connection has been established successfully.');
+  } catch (error) {
+    Logger.error('Database', 'Unable to connect to the database. Aborting startup:', error);
+    process.exit(1);
+  }
 }
 
 async function startServer() {
-	
-	const app = express();
-	const authRoutes = require('./routes/auth');
+  const app = express();
+  const authRoutes = require('./routes/auth');
+  app.use('/auth', authRoutes);
+  app.listen(5000, () => {
+    Logger.log('Bot backend running on https://localhost:5000');
+  });
+}
 
-	app.use('/auth', authRoutes);
+async function initConfig() {
+  const config = await Config.getConfig();
+  const jsonConfig = config.toJSON();
+  jsonConfig.client = createClient();
+  global.my = jsonConfig;
+}
 
-	app.listen(5000, () => {
-		Logger.log('Bot backend running on https://localhost:5000');
-	});
+// Create a new instance of the Client class and register events and commands.
+function createClient() {
+  const client = new Client({
+    intents: [
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.GuildMessageReactions,
+    ],
+    allowedMentions: { parse: ['users', 'roles'], repliedUser: true },
+  });
 
+  EventHandler.registerEvents(client);
+  CommandHandler.registerCommands(client);
+  return client;
 }
