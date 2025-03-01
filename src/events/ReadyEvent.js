@@ -15,8 +15,8 @@ const readyEvent = {
 	once: true,
 	async execute(client) {
 		// Logging when client is ready.
-		if (client.user) Logger.log('Client', `Logged in as ${client.user.tag}!`);
-		else Logger.log('Client', 'Not Logged in!');
+		if (client.user) Logger.debug('Client', `Logged in as ${client.user.tag}!`);
+		else Logger.error('Client', 'Not Logged in!');
 
 		// Deploying Commands.
 		(async () => {

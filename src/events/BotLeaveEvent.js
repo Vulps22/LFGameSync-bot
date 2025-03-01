@@ -13,15 +13,29 @@ const BotJoinEvent = {
 	name: "guildDelete",
 	once: false,
 	async execute(guild) {
-		Logger.log("Left a server!")
+		Logger.log(`**Server Left** Unregistering Server: ${guild.name} - ${guild.id}`);
 
-		DiscordServerUser.destroy({
-			where: { serverId: guild.id }
-		});
+		try {
+			Logger.log("**Server Left** Deleting Server Users");
+			DiscordServerUser.destroy({
+				where: { serverId: guild.id }
+			});
 
-		DiscordServer.destroy({
-			where: { discordId: guild.id }
-		});
+			Logger.log("**Server Left** Server Users Deleted Successfully");
+
+		} catch (error) {
+			Logger.error("**Server Left** Failed To Delete Server Users", error);
+		}
+
+		try {
+			Logger.log("**Server Left** Deleting Server");
+
+			DiscordServer.destroy({
+				where: { discordId: guild.id }
+			});
+		} catch (error) {
+			Logger.error("**Server Left** Failed To Delete Server", error);
+		}
 	},
 }
 

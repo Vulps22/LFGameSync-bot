@@ -15,14 +15,21 @@ const BotJoinEvent = {
 	 * @param {Guild} guild 
 	 */
 	async execute(guild) {
-		Logger.log("Joined a server!")
+		Logger.log(`**Server Joined** ${guild.name} - ${guild.id}`);
 
-		Logger.log("Registering Server");
-		// Try to find or create the user
+		Logger.log("**Server Joined** Registering Server");
+		try {
+			// Try to find or create the user
 			const [server] = await DiscordServer.findOrCreate({
 				where: { discordId: guild.id },
 				defaults: { name: guild.name }
 			});
+
+			Logger.log(`**Server Joined** Server Registered Successfully: ${server.name} - ${server.discordId} - Internal ID: ${server.id}`);
+
+		} catch (error) {
+			Logger.error("**Server Joined** Failed to register server", error);
+		}
 	},
 }
 
