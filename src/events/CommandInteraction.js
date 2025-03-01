@@ -100,36 +100,42 @@ async function checkServer(interaction) {
  * @param {Interaction} interaction 
  */
 async function checkUser(interaction) {
-	const InteractionUser = interaction.user;
-	const discordId = InteractionUser.id;
+    const InteractionUser = interaction.user;
+    const discordId = InteractionUser.id;
 
-	// Check if the user exists
-	const dbUser = await User.findOne({
+    // Try to find or create the user
+    const [user, created] = await User.findOrCreate({
+        where: { discordId: discordId },
+        defaults: { discordName: InteractionUser.username }
+    });
+
+    // If the user was found (not newly created), update the name if needed
+    if (!created && user.discordName !== InteractionUser.username) {
+        user.discordName = InteractionUser.username;
+        await user.save();
+    }
+
+    // Always ensure the GameAccount exists
+    await GameAccount.findOrCreate({
+        where: { userId: user.id }
+    });
+
+    // Always ensure the DiscordServerUser exists
+
+	//we need to find the server id first
+	const server = await DiscordServer.findOne({
 		where: {
-			discordId: discordId,
-		},
+			discordId: interaction.guildId
+		}
 	});
 
-	if (!dbUser) {
-		const user = await User.create({
-			discordId: discordId,
-			discordName: InteractionUser.username,
-		});
-		await GameAccount.create({
-			userId: user.id,
-		})
-		await DiscordServerUser.create({
-			serverId: interaction.guildId,
-			userId: user.id,
-		});
-	} else {
-		// Update the user's name if it has changed
-		if (dbUser.discordName !== InteractionUser.username) {
-			dbUser.discordName = InteractionUser.username;
-			await dbUser.save();
-		}
-	}
-
+    await DiscordServerUser.findOrCreate({
+        where: {
+            serverId: server.id,
+            userId: user.id
+        }
+    });
 }
+
 
 module.exports = interactionEvent;
