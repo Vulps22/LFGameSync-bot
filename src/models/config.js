@@ -9,6 +9,9 @@ class Config extends Model {
   }
 
   static async getConfig() {
+
+    console.log("Getting config for environment", process.env.NODE_ENV);
+
     const config = await this.findOne({
       where: {
         env: process.env.NODE_ENV,
