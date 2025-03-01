@@ -116,8 +116,5 @@ run/
 .env
 dist/
 
-# ignore cofig folder
-config/
-
 # ignore database backup folder
 backups/
