@@ -100,18 +100,18 @@ async function checkServer(interaction) {
  * @param {Interaction} interaction 
  */
 async function checkUser(interaction) {
-    const InteractionUser = interaction.user;
-    const discordId = InteractionUser.id;
+    const interactionUser = interaction.user;
+    const discordId = interactionUser.id;
 
     // Try to find or create the user
     const [user, created] = await User.findOrCreate({
         where: { discordId: discordId },
-        defaults: { discordName: InteractionUser.username }
+        defaults: { discordName: interactionUser.username }
     });
 
     // If the user was found (not newly created), update the name if needed
-    if (!created && user.discordName !== InteractionUser.username) {
-        user.discordName = InteractionUser.username;
+    if (!created && user.discordName !== interactionUser.username) {
+        user.discordName = interactionUser.username;
         await user.save();
     }
 
