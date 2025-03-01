@@ -31,7 +31,7 @@ fs
     db[model.name] = model;
   });
 
-  console.log(db);
+  console.log("Found Models:", db);
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

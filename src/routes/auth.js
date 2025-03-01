@@ -6,10 +6,6 @@ const { Client, GatewayIntentBits } = require('discord.js');
 
 router.get('/steam/callback', async (req, res) => {
 
-
-    console.log('Steam callback hit');
-    console.log(req.query.token);
-
     try {
 
 
@@ -25,8 +21,6 @@ router.get('/steam/callback', async (req, res) => {
             returnUrl: 'https://localhost:5001/auth/steam/callback?token=' + req.query.token,
             apiKey: process.env.STEAM_API_KEY,
         });
-
-        console.log(req);
 
         const steamUser = await steam.authenticate(req);
         const steamId = steamUser.steamid;

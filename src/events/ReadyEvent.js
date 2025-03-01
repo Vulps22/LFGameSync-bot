@@ -22,7 +22,7 @@ const readyEvent = {
 		// Deploying Commands.
 		(async () => {
 			try {
-				//DeployCommands.deployCommands(rest);
+				DeployCommands.deployCommands(rest);
 				console.warn("Commands not deployed: Deployment Disabled. Please deploy them manually.");
 			} catch (error) {
 				console.error(error);
