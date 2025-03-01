@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { User, GameAccount } = require('../models');
+const Logger = require('../utils/logger');
 
 
 
@@ -10,6 +11,9 @@ module.exports = {
 
   async execute(interaction) {
     const discordId = interaction.user.id;
+
+    Logger.log("**Command**: Unlink | Executing unlink command for Discord user:", discordId);
+
     //This is a sequelize model
     const user = await User.findOne({
       where: {
@@ -31,7 +35,7 @@ module.exports = {
 
     gameAccount.steamId = null;
     await gameAccount.save();
-
+    Logger.log("**Command**: Unlink | Removed link between Discord and game accounts for Discord ID:", discordId);
     await interaction.reply({
       content: `The link between your Discord and game accounts has been removed.`,
       ephemeral: true

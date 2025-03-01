@@ -35,4 +35,4 @@ jobs:
           ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'mv ~/env_bak/.env.bak /var/gamesync-bot/.env'
 
       - name: Install dependencies on server and reload
-        run: ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && npm install --omit=dev && pm2 reload all --update-env'
+        run: ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && npm install --omit=dev && npm run migrate && pm2 reload all --update-env'
