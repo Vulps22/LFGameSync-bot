@@ -27,5 +27,3 @@ const BotJoinEvent = {
 }
 
 module.exports = BotJoinEvent;
-
-//invite URL https://discord.com/oauth2/authorize?client_id=1182799024189870151
