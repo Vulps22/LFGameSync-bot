@@ -1,8 +1,7 @@
 const axios = require("axios");
 const BotEvent = require("../interfaces/botEvent.js");
-const { Interaction } = require("discord.js");
-const config = require("../config.js");
-const Caller = require("../utils/caller.js");
+const DiscordServer = require("../models/discord_server.js");
+const DiscordServerUser = require("../models/discord_server_user.js");
 
 
 // @ts-check
@@ -16,8 +15,13 @@ const BotJoinEvent = {
 	async execute(guild) {
 		console.log("Left a server!")
 
-		console.log(`${config.baseURL}/api/lfg/remove_server`);
-		await Caller.removeServer(guild.id);
+		DiscordServerUser.destroy({
+			where: { serverId: guild.id }
+		});
+
+		DiscordServer.destroy({
+			where: { discordId: guild.id }
+		});
 	},
 }
 

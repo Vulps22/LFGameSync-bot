@@ -1,5 +1,6 @@
-const Caller = require('../utils/caller.js');
 const BotEvent = require('../interfaces/botEvent.js');
+const DiscordServer = require('../models/discord_server.js');
+const { Guild } = require('discord.js');
 
 // @ts-check
 
@@ -9,12 +10,19 @@ const BotEvent = require('../interfaces/botEvent.js');
 const BotJoinEvent = {
 	name: "guildCreate",
 	once: false,
+	/**
+	 * 
+	 * @param {Guild} guild 
+	 */
 	async execute(guild) {
 		console.log("Joined a server!")
 
-		// send server ID, name and image to https://gamesync.ajmcallister.co.uk/api/lfg/register_server
-		console.log("Registering Server with data: ");
-		await Caller.registerServer(guild?.id, guild?.name, guild?.iconURL());
+		console.log("Registering Server");
+		// Try to find or create the user
+			const [server] = await DiscordServer.findOrCreate({
+				where: { discordId: guild.id },
+				defaults: { name: guild.name }
+			});
 	},
 }
 

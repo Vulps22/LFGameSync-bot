@@ -1,8 +1,32 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../src/utils/sequelize.js';
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../utils/sequelize.js');
 
-const PersonalAccessToken = sequelize.define(
-  'PersonalAccessToken',
+/**
+ * @typedef {Object} PersonalAccessTokenAttributes
+ * @property {number} id
+ * @property {string} tokenableType
+ * @property {number} tokenableId
+ * @property {string} name
+ * @property {string} token
+ * @property {string} abilities
+ * @property {Date} lastUsedAt
+ * @property {Date} expiresAt
+ * @property {Date} createdAt
+ * @property {Date} updatedAt
+ */
+
+/**
+ * @typedef {Model<PersonalAccessTokenAttributes>} PersonalAccessTokenInstance
+ */
+
+/**
+ * @class PersonalAccessToken
+ * @extends Model
+ */
+class PersonalAccessToken extends Model {
+}
+
+PersonalAccessToken.init(
   {
     id: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -46,18 +70,22 @@ const PersonalAccessToken = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
       field: 'created_at',
+      defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
       field: 'updated_at',
+      defaultValue: DataTypes.NOW,
     },
   },
   {
+    sequelize,
+    modelName: 'PersonalAccessToken',
     tableName: 'personal_access_tokens',
     timestamps: true,
-    underscored: true,
+    underscored: true, // Ensures Sequelize uses snake_case in DB
   }
 );
 
-export default PersonalAccessToken;
+module.exports = PersonalAccessToken;
