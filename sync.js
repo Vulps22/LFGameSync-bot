@@ -2,7 +2,6 @@ require('dotenv').config();
 
 const sequelize = require("./src/utils/sequelize");
 const db = require("./src/models"); // Import all models to ensure associations are applied
-const Logger = require("./src/utils/logger");
 
 const forceSync = process.argv.includes("--force");
 
@@ -20,10 +19,10 @@ async function syncDatabase() {
       await sequelize.query("SET FOREIGN_KEY_CHECKS = 1;"); // ✅ Re-enable foreign key checks
     }
 
-    Logger.log(`Database synchronized (force: ${forceSync})`);
+    console.log(`Database synchronized (force: ${forceSync})`);
     process.exit();
   } catch (err) {
-    Logger.error("An error occurred:", err);
+    console.error("An error occurred:", err);
     process.exit(1);
   }
 }
