@@ -49,10 +49,6 @@ DiscordServer.init(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    iconHash: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: true,
