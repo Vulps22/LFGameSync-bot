@@ -33,4 +33,4 @@ jobs:
           ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && chmod +x backup.sh'
 
       - name: Install dependencies on server and reload
-        run: ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && npm install --omit=dev --update-env && pm2 reload all'
+        run: ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && npm install --omit=dev && pm2 reload all --update-env'
