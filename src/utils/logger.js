@@ -70,7 +70,8 @@ module.exports = {
     },
 
     /**
-     * Logs a debug message in blue text.
+     * Logs a debug message
+     * Debug messages are only shown in the console (not sent to discord)
      * @param {...any} message 
      */
     async debug(...message) {
@@ -78,95 +79,20 @@ module.exports = {
         console.log(`${BLUE}${header}`, ...message, RESET);
     },
 
-    async editLog(messageId, newString) {
-        try {
-            const channelId = my.logs;
-            const newContent = { content: newString };
-
-            const success = await this.editMessageInChannel(channelId, messageId, newContent);
-
-            if (success) {
-                this.debug(`Log message updated: ${newString}`);
-            } else {
-                this.error(`Failed to update log message with ID: ${messageId}`);
-            }
-        } catch (error) {
-            this.error(`Error editing log message with ID ${messageId}:`, error);
-        }
-    },
-
+    /**
+     * Send an error message to the console and the error channel on discord
+     * @param  {...any} message 
+     */
     async error(...message) {
         const header = formatHeader();
         console.error(`${RED}${header}`, ...message, RESET);
-        // Optionally, log the error to a channel as well.
-    },
 
-    /**
-     * @param {Server} server
-     */
-    async newServer(server) {
-        console.log("New Server");
-        const channelId = my.servers_log;
-        const embed = this.serverEmbed(server);
-        const actionRow = this.createActionRow("server");
+        /** @type {Client} */
+        const client = my.client;
 
-        try {
-            const messageId = await this.sendTo({ embeds: [embed], components: [actionRow], fetchReply: true }, channelId);
+        //log the changes to the log channel on discord
+        const channel = await client.channels.fetch(my.discordErrorChannelId);
 
-            if (messageId) {
-                this.debug("Server message logged with ID:", messageId);
-                server.message_id = messageId;
-                await server.save();
-            } else {
-                this.error("Failed to log the server message.");
-            }
-        } catch (error) {
-            this.error("Error logging new server:", error);
-        }
-    },
-
-    /**
-     * Sends a message to a specific channel.
-     * @param {Object} messageOptions - The message options (content, embeds, etc.) to be sent.
-     * @param {string} channelId - The ID of the channel to send the message to.
-     * @returns {Promise<string|null>} - Resolves with the message ID if sent successfully, or null if unsuccessful.
-     */
-    async sendTo(messageOptions, channelId) {
-        try {
-            const channel = global.client.channels.cache.get(channelId);
-            if (channel) {
-                messageOptions.fetchReply = true;
-                const message = await channel.send(messageOptions);
-                return message.id;
-            }
-            return null;
-        } catch (error) {
-            this.error(`Failed to send message to channel ${channelId}:`, error);
-            return null;
-        }
-    },
-
-    /**
-     * Edits a message in a specific channel.
-     * @param {string} channelId - The ID of the channel containing the message.
-     * @param {string} messageId - The ID of the message to edit.
-     * @param {Object} newContent - The new content for the message.
-     * @returns {Promise<boolean>} - Resolves with `true` if edited successfully.
-     */
-    async editMessageInChannel(channelId, messageId, newContent) {
-        try {
-            const channel = global.client.channels.cache.get(channelId);
-            if (channel) {
-                const message = await channel.messages.fetch(messageId);
-                if (message) {
-                    await message.edit(newContent);
-                    return true;
-                }
-            }
-            return false;
-        } catch (error) {
-            this.error(`Failed to edit message in channel ${channelId}:`, error);
-            return false;
-        }
+        await channel.send(message[0]);
     },
 };
