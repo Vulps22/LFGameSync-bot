@@ -3,7 +3,6 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
 const CommandHandler = require('./utils/commandHandler.js');
 const DeployCommands = require('./utils/deployCommands.js');
-const Logger = require('./utils/logger.js');
 const EventHandler = require('./utils/eventHandler.js');
 const sequelize = require('./utils/sequelize.js');
 const { Config } = require('./models/');
@@ -15,7 +14,7 @@ const express = require('express');
   await initConfig();
 
   // Logging that the client is starting.
-  Logger.debug('Client Starting with Config:', my);
+  console.debug('Client Starting with Config:', my);
 
   my.client.login(my.token);
   startServer();
@@ -24,9 +23,9 @@ const express = require('express');
 async function checkDatabase() {
   try {
     await sequelize.authenticate();
-    Logger.log('Database', 'Connection has been established successfully.');
+    console.log('Database', 'Connection has been established successfully.');
   } catch (error) {
-    Logger.error('Database', 'Unable to connect to the database. Aborting startup:', error);
+    console.error('Database', 'Unable to connect to the database. Aborting startup:', error);
     process.exit(1);
   }
 }
@@ -36,7 +35,7 @@ async function startServer() {
   const authRoutes = require('./routes/auth');
   app.use('/auth', authRoutes);
   app.listen(5000, () => {
-    Logger.log('Bot backend running on https://localhost:5000');
+    console.log('Bot backend running on https://localhost:5000');
   });
 }
 

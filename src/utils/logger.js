@@ -1,5 +1,6 @@
-const { EmbedBuilder, Message } = require('discord.js');
+const { EmbedBuilder, Message, Client } = require('discord.js');
 const path = require('path');
+
 
 const pad_size = 40;
 
@@ -13,8 +14,8 @@ const RESET = "\x1b[0m";
  * @returns {string}
  */
 function getCurrentTime() {
-	let date = new Date();
-	return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    let date = new Date();
+    return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 }
 
 /**
@@ -22,19 +23,19 @@ function getCurrentTime() {
  * @returns {string} The base name of the caller file.
  */
 function getCallerFileName() {
-	const originalFunc = Error.prepareStackTrace;
-	try {
-	  const err = new Error();
-	  Error.prepareStackTrace = (_, stack) => stack;
-	  const stack = err.stack;
-	  // stack[0] is this function, stack[1] is the logger function, so stack[3] should be the caller
-	  const callerFile = stack[3] && stack[3].getFileName();
-	  return callerFile ? path.basename(callerFile) : 'unknown';
-	} catch (err) {
-	  return 'unknown';
-	} finally {
-	  Error.prepareStackTrace = originalFunc;
-	}
+    const originalFunc = Error.prepareStackTrace;
+    try {
+        const err = new Error();
+        Error.prepareStackTrace = (_, stack) => stack;
+        const stack = err.stack;
+        // stack[0] is this function, stack[1] is the logger function, so stack[3] should be the caller
+        const callerFile = stack[3] && stack[3].getFileName();
+        return callerFile ? path.basename(callerFile) : 'unknown';
+    } catch (err) {
+        return 'unknown';
+    } finally {
+        Error.prepareStackTrace = originalFunc;
+    }
 }
 
 /**
@@ -42,21 +43,30 @@ function getCallerFileName() {
  * @returns {string}
  */
 function formatHeader() {
-	const header = `[${getCurrentTime()}] [${getCallerFileName()}]`;
-	return header.length < pad_size ? header.padEnd(pad_size, ' ') + "| " : header + " | ";
+    const header = `[${getCurrentTime()}] [${getCallerFileName()}]`;
+    return header.length < pad_size ? header.padEnd(pad_size, ' ') + "| " : header + " | ";
 }
 
 module.exports = {
 
     /**
      * Logs a message to the console like a normal console.log.
+     * Also sends the message to the logs channel on discord
+     * Note that only the first argument is sent to discord
      * @param {...any} message 
      * @returns {Message}
      */
     async log(...message) {
         const header = formatHeader();
         console.log(`${header}`, ...message);
-        // Optionally, send the log message to a channel if needed.
+
+        /** @type {Client} */
+        const client = my.client;
+
+        //log the changes to the log channel on discord
+        const channel = await client.channels.fetch(my.discordLogChannelId);
+
+        await channel.send(message[0]);
     },
 
     /**

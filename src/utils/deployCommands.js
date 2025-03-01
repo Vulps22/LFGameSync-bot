@@ -3,7 +3,6 @@ const Command = require('../interfaces/Command.js');
 const commandHandler = require('./commandHandler.js');
 const fileSystem = require('fs');
 const filePath = require('path');
-const Logger = require('./logger.js');
 const config = require('../config.js');
 
 module.exports = {
@@ -22,7 +21,7 @@ module.exports = {
 
 			// Checks if the command has a valid structure.
 			if (!command || !command.data || !command.execute) {
-				Logger.log('DeploymentCommands', `${name} does not have a valid command structure.`);
+				console.log('DeploymentCommands', `${name} does not have a valid command structure.`);
 				return;
 			}
 			// Adds the command to the collection.
@@ -37,7 +36,7 @@ module.exports = {
 	 * @param rest The REST object to use for deployment.
 	 */
 	deployCommands: async function () {
-		Logger.log('Started refreshing application (/) commands.');
+		console.log('Started refreshing application (/) commands.');
 
 		const rest = new REST().setToken(my.token);
 
@@ -45,14 +44,14 @@ module.exports = {
 			Routes.applicationCommands(config.clientId),
 			{ body: this.getDeploymentJson() },
 		).then(() => {
-			Logger.log('Successfully reloaded application (/) commands.');
+			console.log('Successfully reloaded application (/) commands.');
 			// Retrieve the list of global commands.
 			const globalCommands = rest.get(
 				Routes.applicationCommands(config.clientId),
 			).then((commandsList) => {
 				// Creates new collection for commands.
 				const commands = commandsList;
-				Logger.log(`${commands.length} global commands registered.`);
+				console.log(`${commands.length} global commands registered.`);
 			});
 		});
 	},
