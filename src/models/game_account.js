@@ -1,7 +1,12 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../utils/sequelize.js');
 const { User, GameUser } = require('./');
-const { default: SteamAPI } = require('steamapi');
+
+let SteamAPI;
+(async () => {
+  SteamAPI = (await import('steamapi')).default;
+})();
+
 
 /**
  * @typedef {Object} GameAccountAttributes
