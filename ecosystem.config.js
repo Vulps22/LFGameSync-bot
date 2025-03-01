@@ -6,9 +6,6 @@ module.exports = {
         args: 'start',
         cwd: '/var/gamesync-bot',
         watch: false,
-        env: {
-          NODE_ENV: 'production'
-        }
       }
     ]
   };
