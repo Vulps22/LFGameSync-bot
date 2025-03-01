@@ -18,7 +18,6 @@ const {
 
 const Command = require('../interfaces/Command.js');
 const config = require('../config.js');
-const Caller = require('../utils/caller.js');
 const EmbeddedGame = require('../utils/embeddedGame.js');
 const { Game, GameUser, DiscordServer, DiscordServerUser, User } = require('../models'); // Ensure correct import path
 

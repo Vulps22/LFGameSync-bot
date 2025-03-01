@@ -2,7 +2,6 @@ const { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBoolea
 const config = require('../config.js');
 const Command = require('../interfaces/Command.js');
 const axios = require('axios');
-const Caller = require('../utils/caller.js');
 const { DiscordServerUser, User } = require('../models'); // Adjust the import path if necessary
 
 
