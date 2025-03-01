@@ -23,6 +23,9 @@ jobs:
           known_hosts: ${{ secrets.SSH_HOST }}
           if_key_exists: replace
 
+      - name: Backup database before deployment
+        run: ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && ./backup.sh'
+
       - name: Copy files
         run: |
           rsync -av --exclude='node_modules' . vulps@161.97.68.166:/var/gamesync-bot
