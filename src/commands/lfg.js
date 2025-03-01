@@ -136,22 +136,22 @@ const lfgCommand = {
 
 					// Create and send an embed with selected users
 					const embeddedGame = new EmbeddedGame(String(game.id));
-					embeddedGame.addUsers(selectedUserNames);
 					const gameEmbed = await embeddedGame.toJSON(interaction.user.id);
-					console.log(gameEmbed);
-					await interaction.channel.send("Hello world!");
-					await interaction.channel?.send({ embeds: [gameEmbed] });
+
+					const taggables = selectedUserNames.map(userId => `<@${userId}>`).join(' ');
+
+					await interaction.channel?.send({ content: taggables, embeds: [gameEmbed] });
 
 				// Handle the "Anyone" button response
 				} else if (selection.isButton() && selection.customId === 'open_request') {
 					const embeddedGame = new EmbeddedGame(String(game.id));
 					const gameEmbed = await embeddedGame.toJSON(interaction.user.id);
-
 					interaction.channel?.send({ embeds: [gameEmbed] });
 				}
 
 			} catch (error) {
 				// Dropdown timed out; no action needed
+				console.error(error);
 				return;
 			}
 
