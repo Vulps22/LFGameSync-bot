@@ -39,56 +39,76 @@ class GameAccount extends Model {
   }
 
   /**
- * Get the user's game library and sync it with the database
- */
+   * Get the user's game library and sync it with the database.
+   * Tracks the number of games removed, created, and added.
+   * @returns {Promise<{ removed: number, created: number, added: number }>}
+   */
   async sync() {
-
     const { GameUser, Game } = require('./'); // Import here to avoid circular dependency
-
-
-    const steam = new SteamAPI(my.steamApiKey); 
-
-    /** @type { User } */
+    const steam = new SteamAPI(my.steamApiKey);
+    /** @type {User} */
     const user = await this.getUser();
 
-    // Fetch user's current games in the database
+    // Fetch user's current game associations from the database.
     const userGames = await user.getGames({ attributes: ['id', 'gameId'] });
 
-    // Get Steam games
+    // Get user's owned games from Steam.
     const steamGames = await steam.getUserOwnedGames(this.steamId, {
       includeAppInfo: true,
       includeFreeGames: true
     });
 
-    // Convert Steam's game list into a Set for quick lookup
+    // Convert Steam's game list into a Set of game IDs for quick lookup.
     const steamGameIds = new Set(steamGames.map(game => game.id));
 
-    // Find games that exist in the database but are no longer in Steam
+    // Identify associations in the DB that are no longer in Steam.
     const gamesToRemove = userGames.filter(dbGame => !steamGameIds.has(dbGame.gameId));
+    const removedCount = gamesToRemove.length;
 
-    // Delete the GameUser entries for games not in Steam anymore
-    if (gamesToRemove.length > 0) {
+    // Delete GameUser entries for games not in Steam anymore.
+    if (removedCount > 0) {
       await GameUser.destroy({
         where: {
           userId: user.id,
-          gameId: gamesToRemove.map(game => game.gameId),
+          gameId: gamesToRemove.map(game => game.gameId)
         },
       });
     }
 
-    // Sync and add new games
-    for (const usersGame of steamGames) {
+    // Recalculate user's associated game IDs after removals.
+    const updatedUserGames = await user.getGames({ attributes: ['id', 'gameId'] });
+    const currentGameIds = new Set(updatedUserGames.map(game => game.gameId));
 
-      const [dbGame] = await Game.findOrCreate({
-        where: { gameId: usersGame.game.id },
+    let createdCount = 0;
+    let addedCount = 0;
+
+    // Loop through Steam games and sync them.
+    for (const usersGame of steamGames) {
+      const steamGameId = usersGame.game.id;
+      // Find or create the game in the database.
+      const [dbGame, created] = await Game.findOrCreate({
+        where: { gameId: steamGameId },
         defaults: { name: usersGame.game.name, imageUrl: usersGame.game.icon },
       });
 
-      await user.addGame(dbGame.id);
+      if (created) {
+        createdCount++;
+      }
+      // If the game isn't already associated with the user, add it.
+      if (!currentGameIds.has(steamGameId)) {
+        await user.addGame(dbGame.id);
+        addedCount++;
+      }
     }
+
+    // Optionally, return an object with the change counts.
+    return {
+      removed: removedCount,
+      created: createdCount,
+      added: addedCount,
+    };
   }
 }
-
 
 // Initialize the GameAccount model
 GameAccount.init(

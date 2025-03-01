@@ -5,6 +5,7 @@
 const { CommandInteraction, EmbedBuilder, Interaction, SlashCommandBuilder } = require('discord.js');
 const Command = require('../interfaces/Command.js');
 const config = require('../config.js');
+const { Logger } = require('sequelize/lib/utils/logger');
 
 
 // @ts-check
@@ -40,7 +41,11 @@ module.export = pingCommand = {
                 {name: ' ', value: ' '},
             ])
 
+            
+
         await action.reply({embeds: [embed]});
+        
+        Logger.log('Interaction', `Help embed sent`);
     },
 };
 
