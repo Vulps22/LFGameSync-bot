@@ -33,6 +33,8 @@ class GameAccount extends Model {
     GameAccount.belongsTo(db.User, {
       foreignKey: 'userId',
       as: 'user',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
   }
 
