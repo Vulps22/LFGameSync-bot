@@ -5,6 +5,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define associations here if needed
     }
+
+    static async getConfig() {
+      return await this.findOne({
+        where: {
+          env: process.env.NODE_ENV,
+        }
+      });
+    }
   }
   Config.init({
     id: {
