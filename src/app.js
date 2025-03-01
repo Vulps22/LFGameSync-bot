@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
 const CommandHandler = require('./utils/commandHandler.js');
 const DeployCommands = require('./utils/deployCommands.js');
@@ -6,6 +8,9 @@ const EventHandler = require('./utils/eventHandler.js');
 const Config = require('./config.js');
 const sequelize = require('./utils/sequelize.js');
 const express = require('express');
+
+
+
 /**
  * https://discord.com/api/oauth2/authorize?client_id=1139301810369204254&permissions=2147601472&scope=bot
  */
