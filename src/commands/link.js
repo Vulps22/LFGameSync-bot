@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const SteamAuth = require('node-steam-openid');
 const { User, LinkToken } = require('../models');
 
+const baseURL = process.env.BASE_URL;
 
 
 module.exports = {
@@ -30,10 +31,10 @@ module.exports = {
     const link = await user.createLinkToken();
 
     const steam = new SteamAuth({
-      realm: 'https://localhost:5001',
-      returnUrl: 'https://localhost:5001/auth/steam/callback?token=' + link.token,
+      realm: `${baseURL}:5001`, // Match this with your previous config
+      returnUrl: `${baseURL}:5001/auth/steam/callback?token=${link.token}`,
       apiKey: process.env.STEAM_API_KEY,
-    });
+  });
     // Generate Steam login URL
     const loginUrl = await steam.getRedirectUrl();
 

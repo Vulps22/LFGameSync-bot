@@ -6,6 +6,8 @@ const { Client, GatewayIntentBits } = require('discord.js');
 
 router.get('/steam/callback', async (req, res) => {
 
+    baseURL = process.env.BASE_URL;
+
     try {
 
 
@@ -17,8 +19,8 @@ router.get('/steam/callback', async (req, res) => {
         }
 
         const steam = new SteamAuth({
-            realm: 'https://localhost:5001', // Match this with your previous config
-            returnUrl: 'https://localhost:5001/auth/steam/callback?token=' + req.query.token,
+            realm: `${baseURL}:5001`, // Match this with your previous config
+            returnUrl: `${baseURL}:5001/auth/steam/callback?token=${req.query.token}`,
             apiKey: process.env.STEAM_API_KEY,
         });
 
