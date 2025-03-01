@@ -29,8 +29,6 @@ module.exports = {
 
     const link = await user.createLinkToken();
 
-    console.log(link.toJSON());
-
     const steam = new SteamAuth({
       realm: 'https://localhost:5001',
       returnUrl: 'https://localhost:5001/auth/steam/callback?token=' + link.token,
