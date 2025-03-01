@@ -28,11 +28,11 @@ jobs:
 
       - name: Copy files
         run: |
-          ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cp /var/gamesync-bot/.env ~/env_bak/.env.bak'
+          ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'mv /var/gamesync-bot/.env ~/env_bak/.env.bak'
           rsync -av --delete --exclude='node_modules' --exclude='.env' . vulps@161.97.68.166:/var/gamesync-bot/
           scp -i ~/.ssh/id_rsa package.json vulps@161.97.68.166:/var/gamesync-bot
           ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && chmod +x backup.sh'
-          ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cp ~/env_bak/.env.bak /var/gamesync-bot/.env'
+          ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'mv ~/env_bak/.env.bak /var/gamesync-bot/.env'
 
       - name: Install dependencies on server and reload
         run: ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && npm install --omit=dev && pm2 reload all --update-env'
