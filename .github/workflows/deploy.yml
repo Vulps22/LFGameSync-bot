@@ -28,7 +28,7 @@ jobs:
 
       - name: Copy files
         run: |
-          rsync -av --exclude='node_modules' . vulps@161.97.68.166:/var/gamesync-bot
+          rsync -av --delete --exclude='node_modules' . vulps@161.97.68.166:/var/gamesync-bot/
           scp -i ~/.ssh/id_rsa package.json vulps@161.97.68.166:/var/gamesync-bot
           ssh -i ~/.ssh/id_rsa vulps@161.97.68.166 'cd /var/gamesync-bot && chmod +x backup.sh'
 
