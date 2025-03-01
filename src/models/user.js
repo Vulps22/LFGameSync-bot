@@ -2,6 +2,8 @@ const crypto = require('crypto');
 const { DataTypes, Model, Op } = require('sequelize');
 const sequelize = require('../utils/sequelize.js');
 const LinkToken = require('./link_token.js');
+const Game = require('./game.js');
+const GameUser = require('./game_user.js');
 
 /**
  * @typedef {Object} UserAttributes
@@ -42,7 +44,7 @@ class User extends Model {
   async isLinked() {
 
     const gameAccount = await this.getGameAccount();
-    console.log(gameAccount.toJSON());
+
     return gameAccount && gameAccount.steamId !== null;
 
   }
@@ -84,12 +86,26 @@ class User extends Model {
   }
 
 
+  async addGame(gameId) {
+    const game = await Game.findByPk(gameId);
+    if (!game) {
+      throw new Error(`Game with ID ${gameId} not found.`);
+    }
+
+    await GameUser.findOrCreate({
+      where: {
+        gameId: gameId,
+        userId: this.id,
+      },
+    });
+
+  }
+
   /**
    * 
    * @param {Model[]} db 
    */
   static associate = (db) => {
-    console.log(db);
 
     User.belongsToMany(db.DiscordServer, {
       through: db.DiscordServerUser,  // Use the actual model, not just a string
@@ -102,7 +118,6 @@ class User extends Model {
       foreignKey: 'userId',
       as: 'serverUsers',
     });
-
 
     User.belongsToMany(db.Game, {
       through: 'GameUser',

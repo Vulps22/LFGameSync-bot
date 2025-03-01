@@ -36,6 +36,7 @@ const sharing = {
 			
 			if (!discordServerUser) {
 				console.error(`DiscordServerUser entry not found for Discord ID ${userId}.`);
+				return;
 			}
 			
 			discordServerUser.shareLibrary = state;
@@ -43,6 +44,12 @@ const sharing = {
 
 			const user = await discordServerUser.getUser()			
 			const userLinked = await user.isLinked();
+
+			if(userLinked && state === true){
+				const gameAccount = await user.getGameAccount();
+				gameAccount.sync();
+			}
+
 
 			action.reply({
 				content: `Game Library Sharing has been ${state === true ? 'enabled' : 'disabled'} on this server ${ userLinked ? '' : 'but you have not linked your Steam Library. Run /link to sync your games with the bot'}`,

@@ -38,6 +38,10 @@ class Game extends Model {
     });
   }
 
+  getSteamURL() {
+    return `https://store.steampowered.com/app/${this.gameId}`;
+  }
+
   static associate = (db) => {
     Game.belongsToMany(db.User, { through: 'GameUser' });
   }
