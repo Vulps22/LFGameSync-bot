@@ -1,4 +1,3 @@
-const Caller = require('../utils/caller.js');
 const BotEvent = require('../interfaces/botEvent.js');
 const DiscordServer = require('../models/discord_server.js');
 const { Guild } = require('discord.js');
