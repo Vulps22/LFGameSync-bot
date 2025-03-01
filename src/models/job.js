@@ -1,8 +1,28 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../src/utils/sequelize.js';
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../utils/sequelize.js');
 
-const Job = sequelize.define(
-  'Job',
+/**
+ * @typedef {Object} JobAttributes
+ * @property {number} id
+ * @property {string} queue
+ * @property {string} payload
+ * @property {number} attempts
+ * @property {number|null} reservedAt
+ * @property {number} availableAt
+ * @property {number} createdAt
+ */
+
+/**
+ * @typedef {Model<JobAttributes>} JobInstance
+ */
+
+/**
+ * @class Job
+ * @extends Model
+ */
+class Job extends Model {}
+
+Job.init(
   {
     id: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -30,18 +50,22 @@ const Job = sequelize.define(
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       field: 'available_at',
+      defaultValue: DataTypes.NOW,
     },
     createdAt: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       field: 'created_at',
+      defaultValue: DataTypes.NOW,
     },
   },
   {
+    sequelize,
+    modelName: 'Job',
     tableName: 'jobs',
     timestamps: false,
-    underscored: true,
+    underscored: true, // Ensures Sequelize uses snake_case in DB
   }
 );
 
-export default Job;
+module.exports = Job;

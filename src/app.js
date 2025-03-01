@@ -5,6 +5,7 @@ const Logger = require('./utils/logger.js');
 const EventHandler = require('./utils/eventHandler.js');
 const Config = require('./config.js');
 const sequelize = require('./utils/sequelize.js');
+const express = require('express');
 /**
  * https://discord.com/api/oauth2/authorize?client_id=1139301810369204254&permissions=2147601472&scope=bot
  */
@@ -38,10 +39,14 @@ const rest = new REST().setToken(Config.clientToken);
 //export rest
 module.exports = { rest };
 
-// Create the client and log in.
-const client = createClient();
-client.login(Config.clientToken);
+global.my = {
+	client: createClient(),
+}
 
+
+my.client.login(Config.clientToken);
+
+startServer();
 
 async function checkDatabase() {
 	try {
@@ -51,4 +56,17 @@ async function checkDatabase() {
 		console.error('Database', 'Unable to connect to the database Aborting startup:', error);
 		process.exit(1);
 	}
+}
+
+async function startServer() {
+	
+	const app = express();
+	const authRoutes = require('./routes/auth');
+
+	app.use('/auth', authRoutes);
+
+	app.listen(5000, () => {
+		console.log('Bot backend running on https://localhost:5000');
+	});
+
 }

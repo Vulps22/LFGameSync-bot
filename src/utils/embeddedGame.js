@@ -1,62 +1,39 @@
-const { APIEmbed, APIEmbedField, EmbedBuilder, RestOrArray } = require('discord.js');
-
-const Game = require('../interfaces/game');
-const Caller = require('./caller');
-const { exit } = require('process');
-
+const { EmbedBuilder } = require('discord.js');
+const Game = require('../models/game'); // Import Game model
 
 class EmbeddedGame {
-  gameId;
-  users;
-
   constructor(gameId) {
     this.gameId = gameId;
     this.users = [];
   }
 
-  async fetchGameData() {
-    try {
-      const gameData = await Caller.getGame(this.gameId);
-        const game = gameData.data;
-        
-      if(!game.id) throw new Error("Game ID Missing");
-      if(!game.name) throw new Error("Game Name Missing");
-      if(!game.image) throw new Error("Game Image Missing");
-      if(!game.storeId) throw new Error("Game Store ID Missing");
-
-      return game;
-
-    } catch (error) {
-      console.error('Error fetching game data:', error);
-      return null;
-    }
-  }
-
   async buildEmbed(user) {
-    const gameData = await this.fetchGameData();
+    // Load the game from the database instead of an external API
+    const game = await Game.findOne({ where: { id: this.gameId } });
 
-    if (!gameData) {
-      console.error('Game data not available.');
+    if (!game) {
+      console.log(`Game not found in database: ${this.gameId}`);
       return null;
     }
-
-    if(!(gameData.id || gameData.name || gameData.storeId || gameData.image)) throw new Error('Game Data missing Information');
 
     const embed = new EmbedBuilder()
-      .setTitle(gameData.name)
-      .setDescription(`<@${user}> wants to play ${gameData.name} ${this.users.length > 0 ? 'with' : ''}`)
-      
-      //if there are users to tag
-      if(this.users.length > 0){
-        const fields = [];
-        this.users.forEach(userId => {
-          fields.push({name: ' ', value: `- <@${userId}>`})
-        });
-        embed.addFields(fields);
-      }
+      .setTitle(game.name)
+      .setDescription(`<@${user}> wants to play ${game.name}${this.users.length ? ' with:' : ''}`)
+      .setImage(`http://cdn.cloudflare.steamstatic.com/steam/apps/${game.gameId}/header.jpg`)
+      .addFields({
+        name: 'Get The Game',
+        value: `[Steam Store](https://store.steampowered.com/app/${game.gameId})`
+      });
 
-      embed.addFields({name: 'Get The Game', value: `[Steam Store](https://store.steampowered.com/app/${gameData.storeId})`})
-      .setImage(`http://cdn.cloudflare.steamstatic.com/steam/apps/${gameData.storeId}/header.jpg`)
+    // Add users if present
+    if (this.users.length) {
+      embed.addFields({
+        name: 'Players',
+        value: this.users.map(userId => `- <@${userId}>`).join('\n')
+      });
+    }
+
+    console.log("ready to return embed", embed);
 
     return embed;
   }
@@ -68,12 +45,10 @@ class EmbeddedGame {
 
   async toJSON(user) {
     const embed = await this.buildEmbed(user);
-    
+    console.log("Built embed", embed);
     if (!embed) {
-      console.error('Failed to build embed.');
-      throw new Error("Failed to Embed Game: " + this.gameId);
+      throw new Error(`Failed to Embed Game: ${this.gameId}`);
     }
-
     return embed.toJSON();
   }
 }

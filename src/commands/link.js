@@ -1,40 +1,46 @@
-const { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Interaction } = require('discord.js');
-const Command = require('../interfaces/Command.js');
-const config = require('../config.js');
-const Caller = require('../utils/caller.js');
-const logger = require('../utils/logger.js');
+const { SlashCommandBuilder } = require('discord.js');
+const SteamAuth = require('node-steam-openid');
+const { User, LinkToken } = require('../models');
+
+const baseURL = process.env.BASE_URL;
 
 
-// @ts-check
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName('link')
+    .setDescription('Link your Steam account to your Discord account'),
 
-/** @type {import('../interfaces/Command').Command} */
-const link = {
-	data: new SlashCommandBuilder()
-		.setName('link')
-		.setDescription('Link your Discord to a Game Library'),
-	async execute(interaction) {
-		let action = interaction;
+  async execute(interaction) {
+    const discordId = interaction.user.id;
+    //This is a sequelize model
+    const user = await User.findOne({
+      where: {
+        discordId: discordId
+      }
+    });
 
-		let token = await Caller.askForToken(action.user.id);
+    if (!user) {
+      interaction.reply({
+        content: 'Something went wrong: We could not find your Discord account in our database. This is likely a bug, please contact the developers.',
+        ephemeral: true
+      });
 
-		if(!token.data) {
-			logger.log("error", token.data)
-			return;
-		}
+      return;
+    }
 
-		token = token.data.token;
+    const link = await user.createLinkToken();
 
-		let embed = new EmbedBuilder()
-		.setTitle('Add a Game Library')
-		.setDescription("Link your Discord account with any of these Game Libraries")
-		.addFields({name: 'View Linked Accounts', value: `[Link Manager](${config.baseURL}/link?token=${token})`});
+    const steam = new SteamAuth({
+      realm: `${baseURL}:5001`, // Match this with your previous config
+      returnUrl: `${baseURL}:5001/auth/steam/callback?token=${link.token}`,
+      apiKey: process.env.STEAM_API_KEY,
+  });
+    // Generate Steam login URL
+    const loginUrl = await steam.getRedirectUrl();
 
-		action.reply({
-			embeds: [embed],
-			ephemeral: true
-		});
-		
-	}
-}
-
-module.exports = link;
+    await interaction.reply({
+      content: `Click this link to link your [Steam account](${loginUrl})`,
+      ephemeral: true
+    });
+  },
+};
