@@ -30,6 +30,7 @@ function createClient() {
 			GatewayIntentBits.GuildMessages,
 			GatewayIntentBits.GuildMessageReactions,
 		],
+		allowedMentions: { parse: ['users', 'roles'], repliedUser: true },
 	});
 
 	EventHandler.registerEvents(client);
