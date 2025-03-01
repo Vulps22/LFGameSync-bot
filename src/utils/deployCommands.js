@@ -38,20 +38,20 @@ module.exports = {
 	 * @param rest The REST object to use for deployment.
 	 */
 	deployCommands: async function (rest) {
-		console.log('Started refreshing application (/) commands.');
+		Logger.log('Started refreshing application (/) commands.');
 
 		const data = await rest.put(
 			Routes.applicationCommands(config.clientId),
 			{ body: this.getDeploymentJson() },
 		).then(() => {
-			console.log('Successfully reloaded application (/) commands.');
+			Logger.log('Successfully reloaded application (/) commands.');
 			// Retrieve the list of global commands.
 			const globalCommands = rest.get(
 				Routes.applicationCommands(config.clientId),
 			).then((commandsList) => {
 				// Creates new collection for commands.
 				const commands = commandsList;
-				console.log(`${commands.length} global commands registered.`);
+				Logger.log(`${commands.length} global commands registered.`);
 			});
 		});
 	},

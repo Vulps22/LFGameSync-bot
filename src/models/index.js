@@ -7,7 +7,7 @@ const basename = path.basename(__filename);
 const db = {};
 
 const sequelize = require('../utils/sequelize');
-
+const Logger = require('../utils/logger');
 
 fs
   .readdirSync(__dirname)
@@ -24,7 +24,7 @@ fs
     db[model.name] = model;
   });
 
-  console.log("Found Models:", db);
+  Logger.log("Found Models:", db);
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

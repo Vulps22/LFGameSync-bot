@@ -25,7 +25,7 @@ const readyEvent = {
 				DeployCommands.deployCommands(rest);
 				console.warn("Commands not deployed: Deployment Disabled. Please deploy them manually.");
 			} catch (error) {
-				console.error(error);
+				Logger.error(error);
 			}
 		})();
 	},

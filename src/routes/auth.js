@@ -3,7 +3,7 @@ const router = express.Router();
 const SteamAuth = require('node-steam-openid');
 const { User, LinkToken } = require('../models');
 const { Client, GatewayIntentBits } = require('discord.js');
-
+const Logger = require('../utils/logger');
 router.get('/steam/callback', async (req, res) => {
 
     baseURL = process.env.LINK_BASE_URL;
@@ -51,7 +51,7 @@ router.get('/steam/callback', async (req, res) => {
 
         res.send('✅ Steam account linked! You can close this page.');
     } catch (error) {
-        console.error('Error in Steam callback:', error);
+        Logger.error('Error in Steam callback:', error);
         res.status(500).send('Authentication failed.');
     }
 });

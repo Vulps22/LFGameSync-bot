@@ -1,7 +1,7 @@
 const BotEvent = require('../interfaces/botEvent.js');
 const DiscordServer = require('../models/discord_server.js');
 const { Guild } = require('discord.js');
-
+const Logger = require('../utils/logger.js');
 // @ts-check
 
 /**
@@ -15,9 +15,9 @@ const BotJoinEvent = {
 	 * @param {Guild} guild 
 	 */
 	async execute(guild) {
-		console.log("Joined a server!")
+		Logger.log("Joined a server!")
 
-		console.log("Registering Server");
+		Logger.log("Registering Server");
 		// Try to find or create the user
 			const [server] = await DiscordServer.findOrCreate({
 				where: { discordId: guild.id },

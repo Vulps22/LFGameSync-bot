@@ -19,8 +19,10 @@ const express = require('express');
 checkDatabase();
 
 // Logging that the client is starting.
-Logger.log('Client', 'Starting...');
+Logger.log('Client Starting...');
 
+Logger.error('Testing Error Log Color:', [1, 2, 3, 4]);
+Logger.debug('Testing Debug Log Color:', [1, 2, 3, 4]);
 
 // Create a new instance of the Client class and register events and commands.
 function createClient() {
@@ -59,7 +61,7 @@ async function checkDatabase() {
 		await sequelize.authenticate();
 		Logger.log('Database', 'Connection has been established successfully.');
 	} catch (error) {
-		console.error('Database', 'Unable to connect to the database Aborting startup:', error);
+		Logger.error('Database', 'Unable to connect to the database Aborting startup:', error);
 		process.exit(1);
 	}
 }
@@ -72,7 +74,7 @@ async function startServer() {
 	app.use('/auth', authRoutes);
 
 	app.listen(5000, () => {
-		console.log('Bot backend running on https://localhost:5000');
+		Logger.log('Bot backend running on https://localhost:5000');
 	});
 
 }

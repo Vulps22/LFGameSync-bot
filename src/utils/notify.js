@@ -1,7 +1,11 @@
 const { Client, WebhookClient } = require('discord.js');
 const { config } = require('dotenv');
-
-// Load environment variables from .env file (if applicable)
+const Logger = require('./logger.js');
+/**
+ * Load environment variables from .env file (if applicable)
+ * @deprecated Will be replaced with Database configuration and global my[]
+ * @returns {void}
+ */
 config();
 
 const channels = {
@@ -25,7 +29,7 @@ const sendTo = (channelKey, message) => {
     const channelURL = channels[channelKey];
 
     if (!channelURL) {
-        console.error(`Channel with key "${channelKey}" not found.`);
+        Logger.error(`Channel with key "${channelKey}" not found.`);
         return;
     }
 
@@ -39,7 +43,7 @@ const setStat = async (channelId, value, client) => {
         if (!channel || channel.isDMBased()) return;
         await channel.setName(value);
     } catch (error) {
-        console.error(`Failed to update channel name: ${error}`);
+        Logger.error(`Failed to update channel name: ${error}`);
     }
 };
 

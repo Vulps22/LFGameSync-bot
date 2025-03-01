@@ -3,7 +3,7 @@ const config = require('../config.js');
 const Command = require('../interfaces/Command.js');
 const axios = require('axios');
 const { DiscordServerUser, User } = require('../models'); // Adjust the import path if necessary
-
+const Logger = require('../utils/logger.js');
 
 // @ts-check
 
@@ -34,7 +34,7 @@ const sharing = {
 			});
 			
 			if (!discordServerUser) {
-				console.error(`DiscordServerUser entry not found for Discord ID ${userId}.`);
+				Logger.error(`DiscordServerUser entry not found for Discord ID ${userId}.`);
 				return;
 			}
 			
@@ -55,8 +55,8 @@ const sharing = {
 				ephemeral: true
 			});
 		} catch (error) {
-			console.error("Error While running /sharing")
-			console.error(error);
+			Logger.error("Error While running /sharing")
+			Logger.error(error);
 		}
 
 	}

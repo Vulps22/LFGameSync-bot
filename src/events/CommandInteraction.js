@@ -35,7 +35,7 @@ const interactionEvent = {
 		try {
 			await command.execute(interaction);
 		} catch (error) {
-			console.log(error);
+			Logger.log(error);
 			Logger.log('Interaction', `Failed to execute command ${interaction.commandName}. ${error}`);
 			await interaction.reply({ content: `[Interaction] Failed to execute command ${interaction.commandName}.`, ephemeral: true });
 		}
@@ -59,7 +59,7 @@ function getCommand(commandName) {
 }
 
 function commandNotFound(commandName) {
-	console.error(`Command Not Found: ${commandName}`);
+	Logger.error(`Command Not Found: ${commandName}`);
 	sendTo("ERROR", `Command Not Found: ${commandName}`);
 }
 

@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const Game = require('../models/game'); // Import Game model
+const Logger = require('./logger');
 
 class EmbeddedGame {
   constructor(gameId) {
@@ -11,7 +12,7 @@ class EmbeddedGame {
     const game = await Game.findOne({ where: { id: this.gameId } });
 
     if (!game) {
-      console.log(`Game not found in database: ${this.gameId}`);
+      Logger.log(`Game not found in database: ${this.gameId}`);
       return null;
     }
 

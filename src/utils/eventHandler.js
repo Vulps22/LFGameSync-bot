@@ -10,10 +10,10 @@ module.exports = {
 	 * @param client {Client}
 	 */
 	registerEvents: function (client) {
-		console.log("=============================================");
-		console.log("              EVENT HANDLER");
-		console.log("=============================================");
-		console.log("Registering events...");
+		Logger.log("=============================================");
+		Logger.log("              EVENT HANDLER");
+		Logger.log("=============================================");
+		Logger.log("Registering events...");
 
 		// Gets all event files - Filters out non .js files.
 		const eventsPath = path.join(__dirname, "..", "events");
@@ -21,7 +21,7 @@ module.exports = {
 		const eventFiles = fs.readdirSync(eventsPath).filter((file) => {
 				return file.endsWith(".js") || file.endsWith(".ts");
 			});
-		console.log("Found " + eventFiles.length + " events.")
+		Logger.log("Found " + eventFiles.length + " events.")
 		// Loads all the events in the events folder.
 		for (const file of eventFiles) {
 			const eventPath = path.join(eventsPath, file);
@@ -31,10 +31,10 @@ module.exports = {
 			const event = require(eventPath);
 
 			if (event.once) {
-				console.log("Registering once event..." + event.name)
+				Logger.log("Registering once event..." + event.name)
 				client.once(event.name, (...args) => event.execute(...args, client));
 			} else {
-				console.log("Registering event..." + event.name)
+				Logger.log("Registering event..." + event.name)
 				client.on(event.name, (...args) => event.execute(...args, client));
 			}
 
@@ -42,7 +42,7 @@ module.exports = {
 			Logger.log("EventHandler", `Registered ${file}.`);
 		}
 
-		console.log("=============================================");
+		Logger.log("=============================================");
 
 	},
 };

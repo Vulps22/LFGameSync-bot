@@ -3,24 +3,24 @@
  */
 
 const config = require("../config.js");
-const logger = require("./logger.js");
+const Logger = require("./logger.js");
 
 
 const axios = require('axios');
 
 const handleResponse = (response, successMessage) => {
-    //console.log(response.data);
+    //Logger.log(response.data);
 
     // You can customize this part based on your needs
     if (successMessage) {
-        console.log(successMessage);
+        Logger.log(successMessage);
     }
 
     return response;
 };
 
 const handleError = (error, errorMessage) => {
-    console.error('Error in API call:', error);
+    Logger.error('Error in API call:', error);
     logger.log("Error", `error in API Call: ${error}`)
 
     // You can customize this part based on your needs

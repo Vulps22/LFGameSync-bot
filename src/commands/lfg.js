@@ -20,6 +20,7 @@ const Command = require('../interfaces/Command.js');
 const config = require('../config.js');
 const EmbeddedGame = require('../utils/embeddedGame.js');
 const { Game, GameUser, DiscordServer, DiscordServerUser, User } = require('../models'); // Ensure correct import path
+const Logger = require('../utils/logger.js');
 
 // @ts-check
 
@@ -151,12 +152,12 @@ const lfgCommand = {
 
 			} catch (error) {
 				// Dropdown timed out; no action needed
-				console.error(error);
+				Logger.error(error);
 				return;
 			}
 
 		} catch (error) {
-			console.error(error);
+			Logger.error(error);
 			await interaction.reply({ content: 'An error occurred while searching for LFG users', ephemeral: true });
 		}
 	},
@@ -201,7 +202,7 @@ async function findPlayers(gameId, serverId, userId) {
 		return users;
 
 	} catch (error) {
-		console.error("Error finding players:", error);
+		Logger.error("Error finding players:", error);
 		throw new Error("Error finding players");
 	}
 }
