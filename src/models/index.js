@@ -8,7 +8,6 @@ const db = {};
 
 const sequelize = require('../utils/sequelize');
 
-
 fs
   .readdirSync(__dirname)
   .filter(file => {

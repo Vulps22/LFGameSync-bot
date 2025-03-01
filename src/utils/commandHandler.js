@@ -1,6 +1,5 @@
 const { Client } = require("discord.js");
 const Command = require("../interfaces/Command.js");
-const logger = require("./logger.js");
 // Imports
 const fileSystem = require("node:fs");
 const filePath = require("node:path");
@@ -31,12 +30,12 @@ module.exports = {
 
 			// Checks if the command has a valid structure.
 			if (command["data"] === undefined && command["execute"] === undefined) {
-				logger.log('CommandHandler', `${file} does not have a valid command structure.`);
+				console.log('CommandHandler', `${file} does not have a valid command structure.`);
 				continue;
 			}
 
 			// Logs that the command has been loaded.
-			logger.log('CommandHandler', `Loaded ${file}.`);
+			console.log('CommandHandler', `Loaded ${file}.`);
 
 			// Adds the command to the collection.
 			commands.set(command.data.name, command);

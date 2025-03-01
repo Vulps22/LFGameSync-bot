@@ -28,6 +28,8 @@ const interactionEvent = {
 		}
 		if (!interaction.isCommand()) return;
 
+		Logger.log(`**Command:** ${interaction.commandName} **User:** ${interaction.user.id} **Guild:** ${interaction.guild.name} - ${interaction.guild.id}`);
+
 		const command = getCommand(interaction.commandName);
 
 		if (!command) { commandNotFound(interaction.commandName); return; }
@@ -35,7 +37,7 @@ const interactionEvent = {
 		try {
 			await command.execute(interaction);
 		} catch (error) {
-			console.log(error);
+			Logger.log(error);
 			Logger.log('Interaction', `Failed to execute command ${interaction.commandName}. ${error}`);
 			await interaction.reply({ content: `[Interaction] Failed to execute command ${interaction.commandName}.`, ephemeral: true });
 		}
@@ -59,7 +61,7 @@ function getCommand(commandName) {
 }
 
 function commandNotFound(commandName) {
-	console.error(`Command Not Found: ${commandName}`);
+	Logger.error(`Command Not Found: ${commandName}`);
 	sendTo("ERROR", `Command Not Found: ${commandName}`);
 }
 
@@ -79,6 +81,7 @@ async function checkServer(interaction) {
 	});
 
 	if (!dbServer) {
+		Logger.log(`**Server Check** Registering Server: ${guild.name} - ${guild.id}`);
 		DiscordServer.create({
 			discordId: discordId,
 			discordName: guild.name,
@@ -109,8 +112,13 @@ async function checkUser(interaction) {
         defaults: { discordName: interactionUser.username }
     });
 
+	if(created) {
+		Logger.log(`**User Check** Registered User: ${interactionUser.id}`);
+	}
+
     // If the user was found (not newly created), update the name if needed
     if (!created && user.discordName !== interactionUser.username) {
+		Logger.log(`**User Check** Updating User: ${interactionUser.id}`);
         user.discordName = interactionUser.username;
         await user.save();
     }
@@ -129,12 +137,17 @@ async function checkUser(interaction) {
 		}
 	});
 
-    await DiscordServerUser.findOrCreate({
+    [discordServerUser, create] = await DiscordServerUser.findOrCreate({
         where: {
             serverId: server.id,
             userId: user.id
         }
     });
+
+	if(create) {
+		Logger.log(`**User Check** Registered Server User: ${interactionUser.id} For Server ${interaction.guildId}`);
+	}
+
 }
 
 
