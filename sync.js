@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const sequelize = require("./src/utils/sequelize");
 const db = require("./src/models"); // Import all models to ensure associations are applied
 
