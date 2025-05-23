@@ -18,6 +18,7 @@ const express = require('express');
 
   my.client.login(my.token);
   startServer();
+  uptimeKuma();
 })();
 
 async function checkDatabase() {
@@ -61,3 +62,22 @@ function createClient() {
   CommandHandler.registerCommands(client);
   return client;
 }
+
+async function uptimeKuma() {
+  //Uptime-kuma ping
+      const axios = require('axios');
+      const retry = require('async-retry'); // You might need to install async-retry via npm
+  
+      setInterval(async () => {
+          try {
+              await retry(async () => {
+                  const response = await axios.get('https://uptime.vulps.co.uk/api/push/O5Y6eI8apw?status=up&msg=OK&ping=');
+              }, {
+                  retries: 3, // Retry up to 3 times
+                  minTimeout: 1000, // Wait 1 second between retries
+              });
+              console.log('Ping succeeded');
+          } catch (error) {
+              console.error('Ping failed after retries:', error.message);
+          }
+      }, 60000); // Ping every 60 seconds
