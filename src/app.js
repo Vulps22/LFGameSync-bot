@@ -81,3 +81,4 @@ async function uptimeKuma() {
               console.error('Ping failed after retries:', error.message);
           }
       }, 60000); // Ping every 60 seconds
+}
